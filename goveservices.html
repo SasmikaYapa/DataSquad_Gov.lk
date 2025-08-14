@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gov.lk Services Portal (Demo)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand:#004080; --brand-2:#0073e6; --bg:#f4f6f8; --text:#1f2937; --card:#ffffff; --muted:#6b7280;
+    --ok:#16a34a; --warn:#f59e0b; --danger:#dc2626; --ring:rgba(0,115,230,0.25);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:'Inter',system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
+  body.dark{--bg:#111827; --text:#e5e7eb; --card:#1f2937; --muted:#9ca3af; --brand:#0b5fc1; --brand-2:#1f84ff}
+  header{position:sticky;top:0;z-index:50;background:var(--brand);color:#fff;padding:.9rem 1.25rem;display:flex;gap:1rem;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+  .brand{display:flex;gap:.75rem;align-items:center}
+  .brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--brand) 0%, var(--brand-2) 100%);display:grid;place-items:center;font-weight:800}
+  nav{display:flex;flex-wrap:wrap;gap:.5rem}
+  nav a{color:#fff;text-decoration:none;font-weight:600;padding:.4rem .7rem;border-radius:8px}
+  nav a:hover{background:rgba(255,255,255,.12)}
+  .btn{background:var(--brand-2);color:#fff;border:none;border-radius:10px;padding:.55rem .9rem;font-weight:600;cursor:pointer}
+  .btn:hover{filter:brightness(.95)}
+  .btn.secondary{background:#0ea5e9}
+  .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.25)}
+  .btn.muted{background:#e5e7eb;color:#111827}
+  .btn.warn{background:var(--warn);color:#111827}
+  .container{max-width:1200px;margin:0 auto;padding:1.25rem}
+  .hero{background:linear-gradient(90deg,var(--brand),var(--brand-2));color:#fff;padding:2rem 1.25rem}
+  .hero h1{font-size:1.9rem;margin:.2rem 0}
+  .hero p{opacity:.95}
+  .toolbar{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-top:1rem}
+  .search{flex:1;min-width:240px;display:flex;align-items:center;gap:.5rem;background:var(--card);border-radius:12px;padding:.5rem .75rem;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  .search input{flex:1;border:none;outline:none;background:transparent;color:var(--text);font-size:.95rem} /* MODIFIED */
+  .toggle{padding:.45rem .75rem;border-radius:10px;border:1px solid rgba(255,255,255,.25)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem}
+  .card{background:var(--card);border-radius:14px;padding:1rem;box-shadow:0 6px 14px rgba(0,0,0,.07);transition:.2s;cursor:pointer}
+  .card:hover{transform:translateY(-4px);box-shadow:0 12px 24px rgba(0,0,0,.12)}
+  .card h3{margin:.35rem 0;font-size:1.05rem}
+  .pill{display:inline-block;padding:.18rem .5rem;border-radius:999px;background:#e5f2ff;color:#0b63c7;font-size:.75rem;font-weight:700}
+  body.dark .pill{background:#153a63;color:#dbeafe}
+  .muted{color:var(--muted)}
+  section h2{font-size:1.2rem;margin:1rem 0 .5rem 0}
+  .calendar{background:var(--card);padding:1rem;border-radius:14px;box-shadow:0 6px 14px rgba(0,0,0,.07)}
+  .row{display:flex;gap:.75rem;flex-wrap:wrap}
+  .field{flex:1;min-width:200px;display:flex;flex-direction:column;gap:.35rem}
+  select, input[type="date"], input[type="time"], input[type="text"], input[type="password"], input[type="number"]{padding:.6rem .7rem;border-radius:10px;border:1px solid #e5e7eb;background:var(--card);color:var(--text)} /* MODIFIED */
+  body.dark select, body.dark input{border-color:#374151}
+  .table{width:100%;border-collapse: collapse}
+  .table th,.table td{padding:.6rem .5rem;border-bottom:1px solid #e5e7eb}
+  body.dark .table th, body.dark .table td{border-color:#374151}
+  .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#111827;color:#e5e7eb;padding:.15rem .35rem;border-radius:6px}
+  footer{background:var(--brand);color:#fff;text-align:center;padding:1rem;margin-top:2rem}
+
+  /* Modal */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:1rem}
+  .modal.open{display:flex}
+  .modal .box{width:100%;max-width:760px;background:var(--card);color:inherit;border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,.25)}
+  .box header{position:relative;background:transparent;color:inherit;padding:1rem 1.25rem;box-shadow:none}
+  .box header .close{position:absolute;right:10px;top:10px;background:transparent;border:none;font-size:1.4rem;color:inherit;cursor:pointer}
+  .box .content{padding:0 1.25rem 1.25rem}
+  .stepper{display:flex;gap:.5rem;flex-wrap:wrap;margin:.3rem 0 1rem}
+  .step{padding:.25rem .6rem;border-radius:999px;border:1px solid #e5e7eb}
+  body.dark .step{border-color:#374151}
+  .step.active{background:#e5f2ff;color:#0b63c7;border-color:transparent}
+  .hint{font-size:.85rem;color:var(--muted)}
+  .divider{height:1px;background:#e5e7eb;margin:.85rem 0}
+  body.dark .divider{background:#374151}
+
+  .tag{display:inline-block;margin:.15rem .2rem 0 0;padding:.15rem .45rem;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:.7rem;font-weight:700}
+  body.dark .tag{background:#312e81;color:#c7d2fe}
+
+
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">LK</div>
+      <div>
+        <div style="font-weight:800;letter-spacing:.3px">Gov.lk Services Portal</div>
+        <div class="hint" id="clock">—</div>
+      </div>
+    </div>
+    <nav>
+      <a href="#services">Services</a>
+      <a href="#book">Book</a>
+      <a href="#appointments">My Appointments</a>
+      <a href="#login">Login</a>
+      <button class="btn ghost" id="darkToggle">🌙 Mode</button>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <span class="pill">Sri Lanka</span>
+      <h1>One portal for government services 🇱🇰</h1>
+      <p>Browse departments (Immigration, Inland Revenue, DMT, Agrarian Development, Fertilizer Secretariat, Police Fines, and more). Book at a convenient venue, date and time.</p>
+      <div class="toolbar">
+        <div class="search"><span>🔎</span><input id="q" placeholder="Search department, service, or keyword (e.g., passport, VAT, fertilizer)"/></div>
+        <button class="btn" id="addServiceBtn">➕ Propose New Service</button>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <section id="services">
+      <h2>Departments & Agencies</h2>
+      <div class="grid" id="deptGrid"></div>
+    </section>
+
+    <section id="book" style="margin-top:1.25rem">
+      <h2>Quick Book</h2>
+      <div class="calendar">
+        <div class="row">
+          <div class="field">
+            <label>Department</label>
+            <select id="qbDept"></select>
+          </div>
+          <div class="field">
+            <label>Service</label>
+            <select id="qbService"></select>
+          </div>
+        </div>
+        <div class="row" style="margin-top:.5rem">
+          <div class="field">
+            <label>District</label>
+            <select id="qbDistrict"></select>
+          </div>
+          <div class="field">
+            <label>Venue</label>
+            <select id="qbVenue"></select>
+            <span class="hint">Can't find a nearby place? <button class="btn muted" id="requestVenueBtn" type="button">Request a convenient place</button></span>
+          </div>
+        </div>
+        <div class="row" style="margin-top:.5rem">
+          <div class="field"><label>Date</label><input type="date" id="qbDate"></div>
+          <div class="field"><label>Time</label><input type="time" id="qbTime"></div>
+        </div>
+        <div class="row" style="margin-top:.75rem">
+          <button class="btn" id="qbBook">Book Now</button>
+        </div>
+        <p id="qbMsg" style="font-weight:700;margin-top:.75rem"></p>
+      </div>
+    </section>
+
+    <section id="appointments" style="margin-top:1.25rem">
+      <h2>My Appointments</h2>
+      <div class="calendar">
+        <table class="table" id="apptTable">
+          <thead>
+            <tr><th>Ref</th><th>Department</th><th>Service</th><th>Venue</th><th>Date</th><th>Time</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <p class="hint">Tip: Click <span class="kbd">.ics</span> to add to your calendar.</p>
+      </div>
+    </section>
+
+    <section id="login" style="margin-top:1.25rem">
+      <h2>Login</h2>
+      <div class="calendar">
+        <div class="row">
+          <div class="field"><label>Username</label><input id="username" placeholder="e.g., sithum"/></div>
+          <div class="field"><label>Password</label><input id="password" type="password"/></div>
+          <div class="field"><label>NIC (optional)</label><input id="nic" placeholder="e.g., 200012345678"/></div>
+        </div>
+        <div class="row" style="margin-top:.5rem">
+          <button class="btn" id="loginBtn">Login</button>
+          <button class="btn secondary" id="logoutBtn">Logout</button>
+          <span id="loginMsg" class="hint"></span>
+        </div>
+        <div id="whoami" style="margin-top:.75rem;font-weight:700"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>© 2025 Gov.lk Services Portal — Demo for Designathon | Not an official government website.</div>
+  </footer>
+
+  <!-- Service Details / Booking Modal (multi-step) -->
+  <div class="modal" id="serviceModal">
+    <div class="box">
+      <header>
+        <strong id="smTitle">Service details</strong>
+        <button class="close" onclick="closeModal('serviceModal')">✕</button>
+      </header>
+      <div class="content">
+        <div class="stepper" id="smSteps"></div>
+        <div id="smBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Propose Service Modal -->
+  <div class="modal" id="proposeModal">
+    <div class="box">
+      <header>
+        <strong>Propose a New Service</strong>
+        <button class="close" onclick="closeModal('proposeModal')">✕</button>
+      </header>
+      <div class="content">
+        <div class="row">
+          <div class="field"><label>Department / Agency</label><input id="psDept" placeholder="e.g., Department of Wildlife Conservation"/></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Service Name</label><input id="psName" placeholder="e.g., Entry Permit for Yala"/></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Short Description</label><input id="psDesc" placeholder="What is this service about?"/></div>
+        </div>
+        <div class="row">
+          <button class="btn" id="psSave">Submit</button>
+          <span class="hint" id="psMsg"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Request Venue Modal -->
+  <div class="modal" id="venueModal">
+    <div class="box">
+      <header>
+        <strong>Request a Convenient Place</strong>
+        <button class="close" onclick="closeModal('venueModal')">✕</button>
+      </header>
+      <div class="content">
+        <p class="hint">Tell us your preferred town/city for mobile or regional service counters.</p>
+        <div class="row">
+          <div class="field"><label>Preferred City/Town</label><input id="rvCity" placeholder="e.g., Anuradhapura, Ratnapura"/></div>
+          <div class="field"><label>Notes (optional)</label><input id="rvNotes" placeholder="Near bus stand / weekends only, etc."/></div>
+        </div>
+        <div class="row"><button class="btn" id="rvSave">Send Request</button><span class="hint" id="rvMsg"></span></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ====== CLOCK & THEME ======
+const clockEl = document.getElementById('clock');
+const darkToggle = document.getElementById('darkToggle');
+function updateClock(){ clockEl.textContent = new Date().toLocaleString('en-LK', { timeZone: 'Asia/Colombo' }); }
+setInterval(updateClock,1000); updateClock();
+function applyTheme(){ document.body.classList.toggle('dark', localStorage.getItem('theme')==='dark'); }
+applyTheme();
+darkToggle.addEventListener('click',()=>{ const t = localStorage.getItem('theme')==='dark'?'light':'dark'; localStorage.setItem('theme',t); applyTheme();});
+
+// ====== DATA (Sri Lanka Context) ======
+const DISTRICTS = [
+  'Colombo','Gampaha','Kalutara','Kandy','Matale','Nuwara Eliya','Galle','Matara','Hambantota','Jaffna','Kilinochchi','Mannar','Vavuniya','Mullaitivu','Batticaloa','Ampara','Trincomalee','Kurunegala','Puttalam','Anuradhapura','Polonnaruwa','Badulla','Monaragala','Ratnapura','Kegalle'
+];
+
+const VENUES = [
+  { id:'imm-col', name:'Dept. of Immigration & Emigration – Suhurupaya', district:'Colombo', city:'Battaramulla' },
+  { id:'imm-kdy', name:'Immigration Regional Office – Kandy', district:'Kandy', city:'Kandy' },
+  { id:'imm-mtr', name:'Immigration Regional Office – Matara', district:'Matara', city:'Matara' },
+  { id:'dmt-wer', name:'Department of Motor Traffic (RMV) – Werahera', district:'Colombo', city:'Werahera' },
+  { id:'dmt-kur', name:'RMV Regional Office – Kurunegala', district:'Kurunegala', city:'Kurunegala' },
+  { id:'ir-std', name:'Inland Revenue – Head Office', district:'Colombo', city:'Colombo 02' },
+  { id:'agri-divsec', name:'Divisional Secretariat – Agrarian Development Counter', district:'Anuradhapura', city:'Anuradhapura' },
+  { id:'fert-sec', name:'National Fertilizer Secretariat – Service Desk', district:'Colombo', city:'Narahenpita' },
+  { id:'pol-fines-col', name:'Traffic Fines – Police HQ Counter', district:'Colombo', city:'Colombo 01' },
+  { id:'post-fines-any', name:'Traffic/Court Fine Payment – Main Post Office', district:'Kandy', city:'Kandy' },
+  { id:'tax-tri', name:'Inland Revenue – Trincomalee District Office', district:'Trincomalee', city:'Trincomalee' },
+  { id:'agrarian-keg', name:'Agrarian Service Centre – Kegalle', district:'Kegalle', city:'Kegalle' },
+  { id:'divsec-any', name:'Nearest Divisional Secretariat', district:'Gampaha', city:'Gampaha' },
+];
+
+const DEPARTMENTS = [
+  {
+    id:'imm', name:'Department of Immigration & Emigration', emoji:'🛂', description:'Passports, visas, citizenship services.',
+    tags:['passport','visa','citizenship','dual'],
+    services:[
+      { id:'passport-new', name:'Passport – New Application', requirements:['NIC','Birth Certificate','Old Passport (if any)','Photos'], venues:['imm-col','imm-kdy','imm-mtr'], fee:'Varies', online:true },
+      { id:'passport-renew', name:'Passport – Renewal', requirements:['Existing Passport','NIC'], venues:['imm-col','imm-kdy','imm-mtr'], fee:'Varies', online:true },
+      { id:'dual-cit', name:'Dual Citizenship', requirements:['Application forms','Police report','Certificates'], venues:['imm-col'], fee:'Varies', online:false }
+    ]
+  },
+  {
+    id:'dmt', name:'Department of Motor Traffic (RMV)', emoji:'🚗', description:'Driving licences, vehicle registrations.',
+    tags:['driving license','vehicle','rmv','revenue'],
+    services:[
+      { id:'dl-new', name:'Driving Licence – Practical Test & Issuance', requirements:['Theory Pass','Medical Certificate','NIC'], venues:['dmt-wer','dmt-kur'], fee:'Varies', online:false },
+      { id:'veh-reg', name:'Vehicle Registration', requirements:['MTA6','Customs docs','Insurance'], venues:['dmt-wer'], fee:'Varies', online:false }
+    ]
+  },
+  {
+    id:'ird', name:'Inland Revenue Department', emoji:'💼', description:'Taxpayer registration, e-filing, VAT.',
+    tags:['tax','VAT','TIN','income'],
+    services:[
+      { id:'tin', name:'Taxpayer Identification Number (TIN) Registration', requirements:['NIC','Proof of Address'], venues:['ir-std','tax-tri'], fee:'Free', online:true },
+      { id:'vat-reg', name:'VAT Registration', requirements:['BR Certificate','NIC','Bank Letter'], venues:['ir-std'], fee:'Varies', online:true }
+    ]
+  },
+  {
+    id:'agr', name:'Department of Agrarian Development', emoji:'🌾', description:'Farmer registration, subsidies.',
+    tags:['farmer','cultivation','samurdhi'],
+    services:[
+      { id:'farmer-reg', name:'Farmer Registration / Updates', requirements:['NIC','Land documents'], venues:['agri-divsec','agrarian-keg','divsec-any'], fee:'Free', online:false },
+      { id:'paddy-subsidy', name:'Paddy Land & Subsidy Assistance', requirements:['Farmer ID','Land details'], venues:['agri-divsec','divsec-any'], fee:'Free', online:false }
+    ]
+  },
+  {
+    id:'fert', name:'National Fertilizer Secretariat', emoji:'🧪', description:'Fertilizer subsidy & allocation.',
+    tags:['fertilizer','subsidy','agri'],
+    services:[
+      { id:'fert-subsidy', name:'Fertilizer Subsidy Enrollment', requirements:['Farmer Registration','NIC'], venues:['fert-sec','divsec-any'], fee:'Free', online:false }
+    ]
+  },
+  {
+    id:'pol', name:'Sri Lanka Police – Fines & Certificates', emoji:'🚓', description:'Traffic fines payment, clearance certificates.',
+    tags:['fine','traffic','police','certificate'],
+    services:[
+      { id:'traffic-fine', name:'Traffic Fine Payment (Counter)', requirements:['Fine Reference','NIC'], venues:['pol-fines-col','post-fines-any'], fee:'As per ticket', online:false },
+      { id:'pol-clear', name:'Police Clearance Certificate (Submission)', requirements:['NIC','Birth Certificate'], venues:['pol-fines-col'], fee:'Varies', online:true }
+    ]
+  },
+  {
+    id:'drp', name:'Dept. for Registration of Persons (NIC)', emoji:'🪪', description:'NIC applications and updates.',
+    tags:['nic','id','registration'],
+    services:[
+      { id:'nic-new', name:'NIC – New Application', requirements:['Birth Certificate','Grama Niladhari letter','Photos'], venues:['divsec-any'], fee:'Varies', online:false },
+      { id:'nic-dup', name:'NIC – Duplicate / Lost', requirements:['Police report','Photos'], venues:['divsec-any'], fee:'Varies', online:false }
+    ]
+  }
+];
+
+// ====== UTILITIES ======
+const byId = id => document.getElementById(id);
+const fmtDate = d => new Date(d).toLocaleDateString('en-LK');
+const pad = n => String(n).padStart(2,'0');
+function uid(){ return 'LK-' + Math.random().toString(36).slice(2,8).toUpperCase(); }
+function downloadICS(appt){
+  // Very small ICS generator
+  const dt = appt.date.replaceAll('-','') + 'T' + appt.time.replace(':','') + '00';
+  const dtEnd = appt.date.replaceAll('-','') + 'T' + (pad((+appt.time.slice(0,2))+1)) + appt.time.slice(2) + '00';
+  const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Gov.lk Demo//EN\nBEGIN:VEVENT\nUID:${appt.ref}\nDTSTAMP:${dt}Z\nDTSTART:${dt}\nDTEND:${dtEnd}\nSUMMARY:${appt.department} – ${appt.service}\nLOCATION:${appt.venue}\nDESCRIPTION:Appointment via Gov.lk demo portal\nEND:VEVENT\nEND:VCALENDAR`;
+  const blob = new Blob([ics], {type:'text/calendar'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `${appt.ref}.ics`; a.click(); URL.revokeObjectURL(url);
+}
+
+function save(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
+function load(key,def){ try{ return JSON.parse(localStorage.getItem(key)) ?? def }catch{ return def } }
+
+// ====== RENDER DEPARTMENTS ======
+const deptGrid = byId('deptGrid');
+function renderDepartments(list){
+  deptGrid.innerHTML = '';
+  list.forEach(d=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="pill">${d.emoji} ${d.name}</div>
+      <h3>${d.description}</h3>
+      <div class="hint">${d.tags.map(t=>`<span class='tag'>${t}</span>`).join('')}</div>
+      <div class="divider"></div>
+      <div class="row"><button class="btn" data-open="${d.id}">View & Book</button></div>
+    `;
+    card.addEventListener('click', (e)=>{
+      if(e.target.dataset.open){ openServiceModal(d.id); }
+    });
+    deptGrid.appendChild(card);
+  });
+}
+renderDepartments(DEPARTMENTS);
+
+// Search
+byId('q').addEventListener('input', (e)=>{
+  const s = e.target.value.toLowerCase();
+  const filtered = DEPARTMENTS.filter(d=>
+    d.name.toLowerCase().includes(s) || d.description.toLowerCase().includes(s) || d.tags.some(t=>t.toLowerCase().includes(s)) || d.services.some(sv=>sv.name.toLowerCase().includes(s))
+  );
+  renderDepartments(filtered);
+});
+
+// ====== MODALS ======
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+// ====== SERVICE DETAIL / BOOKING FLOW ======
+let SM_STATE = { dept:null, service:null, district:null, venue:null, date:null, time:null };
+
+function openServiceModal(deptId){
+  const dept = DEPARTMENTS.find(d=>d.id===deptId);
+  SM_STATE = { dept:deptId, service:null, district:null, venue:null, date:null, time:null };
+  byId('smTitle').textContent = dept.name;
+  renderSM();
+  openModal('serviceModal');
+}
+
+function renderSM(){
+  const dept = DEPARTMENTS.find(d=>d.id===SM_STATE.dept);
+  const steps = [
+    {id:'svc', label:'Service'},
+    {id:'loc', label:'Venue'},
+    {id:'dt', label:'Date & Time'},
+    {id:'cf', label:'Confirm'}
+  ];
+  const smSteps = byId('smSteps');
+  smSteps.innerHTML = steps.map((s,i)=>`<span class="step ${i<=activeStepIndex()? 'active':''}">${i+1}. ${s.label}</span>`).join('');
+
+  const body = byId('smBody');
+  const step = activeStep();
+  if(step==='svc'){
+    body.innerHTML = `<p class='hint'>Choose a service to continue.</p>` +
+    dept.services.map(s=>`
+      <div class='card' style='margin:.5rem 0;'>
+        <div style='display:flex;justify-content:space-between;gap:.5rem;align-items:center'>
+          <div>
+            <strong>${s.name}</strong><br>
+            <span class='hint'>Fee: ${s.fee} • ${s.online? 'Online available':'Counter service'}</span><br>
+            <span class='hint'>Requirements: ${s.requirements.join(', ')}</span>
+          </div>
+          <button class='btn' data-choose='${s.id}'>Select</button>
+        </div>
+      </div>
+    `).join('');
+    body.querySelectorAll('[data-choose]').forEach(b=> b.addEventListener('click',()=>{ SM_STATE.service=b.dataset.choose; renderSM(); }));
+  }
+  else if(step==='loc'){
+    const svc = dept.services.find(s=>s.id===SM_STATE.service);
+    const vns = VENUES.filter(v=> svc.venues.includes(v.id));
+    body.innerHTML = `
+      <div class='row'>
+        <div class='field'>
+          <label>District</label>
+          <select id='smDistrict'>${[...new Set(vns.map(v=>v.district))].map(d=>`<option ${SM_STATE.district===d?'selected':''}>${d}</option>`).join('')}</select>
+        </div>
+        <div class='field'>
+          <label>Venue</label>
+          <select id='smVenue'></select>
+          <span class='hint'>Need a different place? <button class='btn muted' id='smReqVenue' type='button'>Request convenient place</button></span>
+        </div>
+      </div>
+      <div class='row' style='margin-top:.75rem'>
+        <button class='btn' id='nextDT'>Next</button>
+      </div>
+    `;
+    const distSel = byId('smDistrict');
+    const venueSel = byId('smVenue');
+    function populateVenues(){
+      const options = vns.filter(v=>v.district===distSel.value).map(v=>`<option value='${v.id}'>${v.name} — ${v.city}</option>`);
+      venueSel.innerHTML = options.join('');
+    }
+    populateVenues();
+    distSel.addEventListener('change',()=>{ populateVenues(); });
+    byId('smReqVenue').addEventListener('click',()=>{ openModal('venueModal'); });
+    byId('nextDT').addEventListener('click',()=>{
+      SM_STATE.district = distSel.value; SM_STATE.venue = venueSel.value; renderSM();
+    });
+  }
+  else if(step==='dt'){
+    body.innerHTML = `
+      <div class='row'>
+        <div class='field'><label>Date</label><input type='date' id='smDate'></div>
+        <div class='field'><label>Time</label><input type='time' id='smTime'></div>
+      </div>
+      <div class='row' style='margin-top:.75rem'>
+        <button class='btn' id='nextCF'>Review</button>
+      </div>
+    `;
+    byId('nextCF').addEventListener('click',()=>{ SM_STATE.date = byId('smDate').value; SM_STATE.time = byId('smTime').value; renderSM(); });
+  }
+  else if(step==='cf'){
+    const deptName = dept.name;
+    const svc = dept.services.find(s=>s.id===SM_STATE.service);
+    const venue = VENUES.find(v=>v.id===SM_STATE.venue);
+    body.innerHTML = `
+      <div class='card'>
+        <strong>Summary</strong>
+        <div class='divider'></div>
+        <div><b>Department:</b> ${deptName}</div>
+        <div><b>Service:</b> ${svc.name}</div>
+        <div><b>Venue:</b> ${venue?.name ?? ''} (${SM_STATE.district})</div>
+        <div><b>Date:</b> ${fmtDate(SM_STATE.date)} &nbsp; <b>Time:</b> ${SM_STATE.time}</div>
+      </div>
+      <div class='row' style='margin-top:.75rem'>
+        <button class='btn' id='confirmSM'>Confirm Booking</button>
+      </div>
+    `;
+    byId('confirmSM').addEventListener('click',()=>{
+      if(!(SM_STATE.date && SM_STATE.time && SM_STATE.venue)){ alert('Please complete all fields'); return; }
+      const appt = {
+        ref: uid(),
+        department: deptName,
+        service: svc.name,
+        venue: venue.name,
+        district: SM_STATE.district,
+        date: SM_STATE.date,
+        time: SM_STATE.time
+      };
+      const list = load('appointments', []); list.push(appt); save('appointments', list);
+      renderAppointments();
+      alert(`✅ Booking confirmed: ${appt.ref}`);
+      closeModal('serviceModal');
+    });
+  }
+}
+
+function activeStep(){ if(!SM_STATE.service) return 'svc'; if(!SM_STATE.venue) return 'loc'; if(!(SM_STATE.date && SM_STATE.time)) return 'dt'; return 'cf'; }
+function activeStepIndex(){ return ['svc','loc','dt','cf'].indexOf(activeStep()); }
+
+// ====== QUICK BOOK WIDGET ======
+const qbDept = byId('qbDept');
+const qbService = byId('qbService');
+const qbDistrict = byId('qbDistrict');
+const qbVenue = byId('qbVenue');
+const qbMsg = byId('qbMsg');
+
+function populateQuickBook(){
+  qbDept.innerHTML = DEPARTMENTS.map(d=>`<option value='${d.id}'>${d.name}</option>`).join('');
+  qbDistrict.innerHTML = DISTRICTS.map(d=>`<option>${d}</option>`).join('');
+  onQBDeptChange();
+}
+function onQBDeptChange(){
+  const d = DEPARTMENTS.find(x=>x.id===qbDept.value);
+  qbService.innerHTML = d.services.map(s=>`<option value='${s.id}'>${s.name}</option>`).join('');
+  onQBServiceChange();
+}
+function onQBServiceChange(){
+  const d = DEPARTMENTS.find(x=>x.id===qbDept.value);
+  const s = d.services.find(x=>x.id===qbService.value);
+  const venues = VENUES.filter(v=> s.venues.includes(v.id));
+  const dist = qbDistrict.value;
+  qbVenue.innerHTML = venues.filter(v=>!dist || v.district===dist).map(v=>`<option value='${v.id}'>${v.name} — ${v.city}</option>`).join('');
+}
+
+gb = populateQuickBook; // debug
+qbDept.addEventListener('change', onQBDeptChange);
+qbService.addEventListener('change', onQBServiceChange);
+qbDistrict.addEventListener('change', onQBServiceChange);
+
+byId('qbBook').addEventListener('click',()=>{
+  const d = DEPARTMENTS.find(x=>x.id===qbDept.value);
+  const s = d.services.find(x=>x.id===qbService.value);
+  const v = VENUES.find(x=>x.id===qbVenue.value);
+  const date = byId('qbDate').value; const time = byId('qbTime').value;
+  if(!(d && s && v && date && time)){ qbMsg.textContent = 'Please complete all fields.'; qbMsg.style.color = 'var(--danger)'; return; }
+  const appt = { ref: uid(), department:d.name, service:s.name, venue:v.name, district:v.district, date, time };
+  const list = load('appointments', []); list.push(appt); save('appointments', list);
+  renderAppointments();
+  qbMsg.style.color='var(--ok)';
+  qbMsg.textContent = `✅ Appointment booked: ${appt.ref} — ${fmtDate(date)} ${time} @ ${v.name}`;
+});
+
+byId('requestVenueBtn').addEventListener('click',()=> openModal('venueModal'));
+
+// ====== APPOINTMENTS TABLE ======
+function renderAppointments(){
+  const tbody = document.querySelector('#apptTable tbody');
+  const rows = load('appointments', []);
+  tbody.innerHTML = rows.map(r=>`
+    <tr>
+      <td>${r.ref}</td>
+      <td>${r.department}</td>
+      <td>${r.service}</td>
+      <td>${r.venue} (${r.district})</td>
+      <td>${fmtDate(r.date)}</td>
+      <td>${r.time}</td>
+      <td>
+        <button class='btn muted' data-ics='${r.ref}'>.ics</button>
+        <button class='btn warn' data-cancel='${r.ref}'>Cancel</button>
+      </td>
+    </tr>
+  `).join('');
+  tbody.querySelectorAll('[data-cancel]').forEach(b=> b.addEventListener('click',()=>{
+    const list = load('appointments', []); const idx = list.findIndex(x=>x.ref===b.dataset.cancel);
+    if(idx>-1){ if(confirm('Cancel this appointment?')){ list.splice(idx,1); save('appointments', list); renderAppointments(); } }
+  }));
+  tbody.querySelectorAll('[data-ics]').forEach(b=> b.addEventListener('click',()=>{
+    const appt = load('appointments', []).find(x=>x.ref===b.dataset.ics);
+    if(appt) downloadICS(appt);
+  }));
+}
+
+// ====== LOGIN (SIMPLE DEMO) ======
+function setWhoAmI(){
+  const u = load('authUser',null);
+  byId('whoami').textContent = u? `Logged in as ${u.username}${u.nic? ' • NIC '+u.nic:''}` : 'Not logged in';
+}
+byId('loginBtn').addEventListener('click',()=>{
+  const username = byId('username').value.trim();
+  const password = byId('password').value.trim();
+  const nic = byId('nic').value.trim();
+  if(!(username && password)){ byId('loginMsg').textContent='Enter username & password'; return; }
+  save('authUser',{username,nic});
+  byId('loginMsg').textContent='Logged in ✅';
+  setWhoAmI();
+});
+byId('logoutBtn').addEventListener('click',()=>{ localStorage.removeItem('authUser'); setWhoAmI(); byId('loginMsg').textContent='Logged out'; });
+
+// ====== PROPOSE SERVICE ======
+byId('addServiceBtn').addEventListener('click',()=> openModal('proposeModal'));
+byId('psSave').addEventListener('click',()=>{
+  const dept = byId('psDept').value.trim();
+  const name = byId('psName').value.trim();
+  const desc = byId('psDesc').value.trim();
+  if(!(dept && name)){ byId('psMsg').textContent = 'Please enter department and service'; return; }
+  const list = load('proposedServices', []);
+  list.push({id:uid(), dept, name, desc, when:new Date().toISOString()});
+  save('proposedServices', list);
+  byId('psMsg').textContent = 'Thanks! Saved locally.';
+  setTimeout(()=>{ closeModal('proposeModal'); byId('psDept').value=''; byId('psName').value=''; byId('psDesc').value=''; byId('psMsg').textContent=''; }, 700);
+});
+
+// ====== REQUEST VENUE ======
+byId('rvSave').addEventListener('click',()=>{
+  const city = byId('rvCity').value.trim();
+  const notes = byId('rvNotes').value.trim();
+  if(!city){ byId('rvMsg').textContent='Enter a city/town'; return; }
+  const list = load('venueRequests', []); list.push({id:uid(), city, notes, when:new Date().toISOString()}); save('venueRequests', list);
+  byId('rvMsg').textContent='Request submitted! ✅';
+  setTimeout(()=>{ closeModal('venueModal'); byId('rvCity').value=''; byId('rvNotes').value=''; byId('rvMsg').textContent=''; }, 700);
+});
+
+// ====== INIT ======
+populateQuickBook();
+renderAppointments();
+setWhoAmI();
+</script>
+</body>
+</html>
