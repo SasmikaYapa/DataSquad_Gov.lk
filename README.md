@@ -8,7 +8,7 @@
 
 This prototype is a self-contained index.html file. To run it:
 
-1.  **Download the homecentral.html and 'newpage.html' file.**
+1.  **Download the homecentral.html and newpage.html file.**
 2.  *Open it directly in any modern web browser* (like Chrome, Firefox, or Edge).
 
 No server or installation is required to view and interact with the demo. All data is mocked and stored locally in your browser's localStorage.
