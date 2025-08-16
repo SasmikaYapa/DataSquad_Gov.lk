@@ -4,9 +4,8 @@
 
 ---
 
-## 🚀 Live Demo
 
-This prototype is a self-contained index.html file. To run it:
+This prototype is consist homecentral.html and newpage.html file. To run it:
 
 1.  **Download the homecentral.html and newpage.html file.**
 2.  *Open it directly in any modern web browser* (like Chrome, Firefox, or Edge).
