@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sri Lanka Government Service Portal (All-in-One Demo)</title>
+    <!-- FONTS & ICONS (Combined from all pages) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2Pkf1F2jG6eK8Z8+7xZB1n8kQhY4qZp2vJ9k0a2zYgTz5bJY1QK8Zk9fQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    
+    <style>
+        /* ===== GLOBAL RESET & PAGE NAVIGATION ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Inter', sans-serif;
+        }
+        html { scroll-behavior: smooth; }
+        body { transition: background 0.5s ease; }
+        .page { display: none; /* Pages are hidden by default */ }
+
+        /* ===== STYLES FOR #landing-page (index.html) ===== */
+        #landing-page {
+            background: linear-gradient(120deg, #003366, #0055a5);
+            color: white;
+            overflow-x: hidden;
+        }
+        #landing-page header {
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        #landing-page header h1 { font-size: 1.6rem; font-weight: bold; color: white; }
+        #landing-page nav a { margin: 0 15px; text-decoration: none; color: #fff; font-weight: 500; transition: 0.3s; }
+        #landing-page nav a:hover { color: #ffd700; }
+        #landing-page .hero { position: relative; height: 100vh; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; overflow: hidden; background: #003366; }
+        #landing-page .slideshow-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        #landing-page .slide { display: none; height: 100%; width: 100%; position: absolute; animation: fadeIn 1.5s; }
+        #landing-page .slide img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5); }
+        #landing-page .caption { position: absolute; bottom: 15%; left: 5%; font-size: 1.8rem; font-weight: 700; color: #ffd700cc; text-shadow: 2px 2px 5px #000; max-width: 90%; }
+        #landing-page .prev, #landing-page .next { position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(0,0,0,0.4); border: none; padding: 12px 20px; font-size: 2rem; color: white; cursor: pointer; user-select: none; border-radius: 5px; z-index: 10; }
+        #landing-page .prev:hover, #landing-page .next:hover { background-color: rgba(0,0,0,0.7); }
+        #landing-page .prev { left: 20px; }
+        #landing-page .next { right: 20px; }
+        #landing-page .hero-text { position: relative; max-width: 700px; z-index: 5; }
+        #landing-page .hero-text h2 { font-size: 2.8rem; margin-bottom: 15px; text-shadow: 0 0 10px #000; }
+        #landing-page .hero-text p { font-size: 1.3rem; margin-bottom: 30px; text-shadow: 0 0 8px #000; }
+        #landing-page .get-started-btn { display: inline-block; text-decoration: none; background: #ffd700; color: #003366; padding: 12px 30px; font-size: 1.2rem; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 0 15px #ffd700aa; font-weight: bold; }
+        #landing-page .get-started-btn:hover { background: #ffcc00; transform: scale(1.1); box-shadow: 0 0 25px #ffcc00dd; }
+        #landing-page .departments { padding: 50px 20px; background: #f5f5f5; color: #333; text-align: center; }
+        #landing-page .departments h3 { font-size: 2rem; margin-bottom: 30px; }
+        #landing-page .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        #landing-page .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; text-decoration: none; color: inherit; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #landing-page .card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,0,0,0.2); }
+        #landing-page .card h4 { margin-bottom: 10px; color: #0055a5; }
+        #landing-page footer { background: #002244; color: white; padding: 20px; text-align: center; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ===== STYLES FOR #citizen-portal (newpage.html) ===== */
+        #citizen-portal { font-family:'Inter',system-ui,sans-serif; transition: background .3s, color .3s; }
+        #citizen-portal :root { --brand: #00529B; --brand-2: #007BFF; --accent: #FFC107; --accent-text: #212529; --bg: #F8F9FA; --text: #212529; --card: #FFFFFF; --muted: #6B7280; --ok: #28A745; --warn: #FFC107; --danger: #DC3545; --ring: rgba(0, 123, 255, 0.25); }
+        #citizen-portal.dark { --bg: #121212; --text: #E0E0E0; --card: #1E1E1E; --muted: #9E9E9E; --brand: #0277BD; --brand-2: #4FC3F7; --accent: #FFA000; }
+        #citizen-portal { background: var(--bg); color: var(--text); }
+        #citizen-portal header { position:sticky; top:0; z-index:50; background:var(--card); color:var(--text); padding:.9rem 1.25rem; display:flex; gap:1rem; align-items:center; justify-content:space-between; box-shadow:0 2px 10px rgba(0,0,0,.1); border-bottom: 1px solid rgba(0,0,0,.05); }
+        #citizen-portal.dark header { background: #1e1e1e; border-bottom: 1px solid #333; }
+        #citizen-portal .brand { display:flex; gap:.75rem; align-items:center }
+        #citizen-portal .brand .logo { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--brand) 0%, var(--brand-2) 100%); display:grid; place-items:center; font-weight:800; color:#fff; }
+        #citizen-portal nav { display:flex; flex-wrap:wrap; gap:.5rem; align-items: center; }
+        #citizen-portal nav a { color:var(--text); text-decoration:none; font-weight:600; padding:.4rem .7rem; border-radius:8px }
+        #citizen-portal nav a:hover { background:var(--bg) }
+        #citizen-portal.dark nav a { color:var(--text); }
+        #citizen-portal.dark nav a:hover { background: #333 }
+        #citizen-portal .btn { background:var(--brand-2); color:#fff; border:none; border-radius:10px; padding:.55rem .9rem; font-weight:600; cursor:pointer; transition: filter .2s; }
+        #citizen-portal .btn:hover { filter:brightness(.95) }
+        #citizen-portal .btn.secondary { background:var(--accent); color: var(--accent-text); }
+        #citizen-portal .btn.ghost { background:transparent; color:var(--text); border:1px solid rgba(0,0,0,.1) }
+        #citizen-portal.dark .btn.ghost { color:var(--text); border-color: #555 }
+        #citizen-portal .btn.muted { background:#e9ecef; color:#111827 }
+        #citizen-portal .btn.warn { background:var(--warn); color:#111827 }
+        #citizen-portal .container { max-width:1200px; margin:0 auto; padding:1.25rem }
+        #citizen-portal .hero { background:linear-gradient(90deg,var(--brand),var(--brand-2)); color:#fff; padding:2rem 1.25rem; border-radius: 0 0 20px 20px; }
+        #citizen-portal .hero h1 { font-size:1.9rem; margin:.2rem 0 }
+        #citizen-portal .hero p { opacity:.95 }
+        #citizen-portal .toolbar { display:flex; gap:1rem; align-items:center; flex-wrap:wrap; margin-top:1rem }
+        #citizen-portal .search { flex:1; min-width:240px; display:flex; align-items:center; gap:.5rem; background:var(--card); border-radius:12px; padding:.5rem .75rem; box-shadow:0 2px 10px rgba(0,0,0,.05); color: var(--text); }
+        #citizen-portal .search input { flex:1; border:none; outline:none; background:transparent; color:inherit; font-size:.95rem }
+        #citizen-portal .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1rem }
+        #citizen-portal .card { background:var(--card); border-radius:14px; padding:1rem; box-shadow:0 6px 14px rgba(0,0,0,.07); transition: all .2s; cursor:pointer }
+        #citizen-portal .card:hover { transform:translateY(-4px); box-shadow:0 12px 24px rgba(0,0,0,.12) }
+        #citizen-portal .pill { display:inline-block; padding:.18rem .5rem; border-radius:999px; background:#e5f2ff; color:#0b63c7; font-size:.75rem; font-weight:700 }
+        #citizen-portal.dark .pill { background:#153a63; color:#dbeafe }
+        #citizen-portal section h2 { font-size:1.4rem; margin:2rem 0 1rem 0; padding-bottom: .5rem; border-bottom: 2px solid var(--brand-2); }
+        #citizen-portal .calendar { background:var(--card); padding:1rem; border-radius:14px; box-shadow:0 6px 14px rgba(0,0,0,.07) }
+        #citizen-portal .row { display:flex; gap:.75rem; flex-wrap:wrap }
+        #citizen-portal .field { flex:1; min-width:200px; display:flex; flex-direction:column; gap:.35rem }
+        #citizen-portal select, #citizen-portal input { padding:.6rem .7rem; border-radius:10px; border:1px solid #e5e7eb; background:var(--bg); color:var(--text) }
+        #citizen-portal.dark select, #citizen-portal.dark input { border-color:#374151; background: #333; }
+        #citizen-portal .table { width:100%; border-collapse: collapse }
+        #citizen-portal .table th, #citizen-portal .table td { padding:.75rem .5rem; text-align: left; border-bottom:1px solid #e5e7eb }
+        #citizen-portal.dark .table th, #citizen-portal.dark .table td { border-color:#374151 }
+        #citizen-portal .kbd { font-family:monospace; background:#343a40; color:#f8f9fa; padding:.15rem .35rem; border-radius:6px }
+        #citizen-portal footer { background:var(--brand); color:#fff; text-align:center; padding:1.5rem; margin-top:2rem }
+        #citizen-portal .modal { position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; padding:1rem; z-index: 100; }
+        #citizen-portal .modal.open { display:flex }
+        #citizen-portal .modal .box { width:100%; max-width:760px; background:var(--card); color:inherit; border-radius:16px; box-shadow:0 20px 40px rgba(0,0,0,.25); animation: zoomIn .3s; }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        #citizen-portal .box header { position:relative; background:transparent; color:inherit; padding:1rem 1.25rem; box-shadow:none; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
+        #citizen-portal.dark .box header { border-color: #333; }
+        #citizen-portal .box header .close { background:transparent; border:none; font-size:1.4rem; color:inherit; cursor:pointer }
+        #citizen-portal .box .content { padding:1.25rem }
+        #citizen-portal .stepper { display:flex; gap:.5rem; flex-wrap:wrap; margin:.3rem 0 1rem }
+        #citizen-portal .step { padding:.25rem .6rem; border-radius:999px; border:1px solid #e5e7eb }
+        #citizen-portal.dark .step { border-color:#374151 }
+        #citizen-portal .step.active { background:var(--brand); color:#fff; border-color:transparent }
+        #citizen-portal .hint { font-size:.85rem; color:var(--muted) }
+        #citizen-portal .divider { height:1px; background:#e5e7eb; margin:.85rem 0 }
+        #citizen-portal.dark .divider { background:#374151 }
+        #citizen-portal .tag { display:inline-block; margin:.15rem .2rem 0 0; padding:.15rem .45rem; border-radius:999px; background:#eef2ff; color:#3730a3; font-size:.7rem; font-weight:700 }
+        #citizen-portal.dark .tag { background:#312e81; color:#c7d2fe }
+        #citizen-portal #lang-switcher { border-radius: 8px; padding: .4rem; border: 1px solid rgba(0,0,0,.1); background: var(--bg); color: var(--text) }
+        #citizen-portal.dark #lang-switcher { border-color: #555; }
+        #citizen-portal .star-rating { font-size: 2rem; cursor: pointer; }
+        #citizen-portal .star-rating .star { color: #ccc; }
+        #citizen-portal .star-rating .star.selected, #citizen-portal .star-rating .star:hover { color: var(--accent); }
+        #citizen-portal .filters { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        #citizen-portal .filters .btn.active { background: var(--brand); color: #fff; }
+        #citizen-portal .notification-bell { position: relative; }
+        #citizen-portal #notification-count { position: absolute; top: -5px; right: -5px; background: var(--danger); color: #fff; border-radius: 50%; width: 18px; height: 18px; font-size: .7rem; font-weight: 700; display: grid; place-items: center; }
+        #citizen-portal #notification-list { position: absolute; top: 120%; right: 0; background: var(--card); border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,.15); width: 300px; z-index: 10; display: none; padding: .5rem; border: 1px solid rgba(0,0,0,.08); }
+        #citizen-portal.dark #notification-list { border-color: #333; }
+        #citizen-portal #notification-list.show { display: block; }
+        #citizen-portal #notification-list .item { padding: .75rem; border-bottom: 1px solid #eee; font-size: .9rem; }
+        #citizen-portal.dark #notification-list .item { border-color: #333; }
+        #citizen-portal #notification-list .item:last-child { border: none; }
+        #citizen-portal .checklist ul { list-style-type: '✅ '; padding-left: 1.2rem; }
+
+        /* ===== STYLES FOR #officer-dashboard (officer.html) ===== */
+        body.officer-theme {
+            margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial; background:
+            radial-gradient(1200px 600px at 10% -10%, rgba(34,211,238,.12), transparent 40%),
+            radial-gradient(900px 500px at 110% 10%, rgba(167,139,250,.12), transparent 45%),
+            linear-gradient(180deg, #0b1022 0%, #0a0f1f 100%);
+            color: #e2e8f0; /* var(--text) */
+            height: 100%;
+        }
+        #officer-dashboard .app {display:grid; grid-template-columns: 260px 1fr; min-height:100vh;}
+        #officer-dashboard aside { position:sticky; top:0; height:100vh; backdrop-filter: blur(10px); border-right:1px solid rgba(255,255,255,.06); background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); padding:22px; box-shadow:var(--shadow); }
+        #officer-dashboard .brand {display:flex; gap:12px; align-items:center; margin-bottom:22px}
+        #officer-dashboard .badge {display:inline-flex; align-items:center; gap:8px; padding:8px 12px; background:#1e293b; border:1px solid rgba(255,255,255,.06); border-radius:999px; color:#94a3b8; font-size:12px}
+        #officer-dashboard nav a {display:flex; align-items:center; gap:12px; text-decoration:none; color:#e2e8f0; padding:12px 14px; border-radius:12px; margin:4px 0; transition:.2s ease; border:1px solid transparent}
+        #officer-dashboard nav a:hover {background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.06)}
+        #officer-dashboard nav a.active {background:linear-gradient(135deg, rgba(34,211,238,.18), rgba(167,139,250,.18)); border-color:rgba(255,255,255,.18)}
+        #officer-dashboard .kpis {display:grid; grid-template-columns: repeat(4, minmax(180px,1fr)); gap:16px;}
+        #officer-dashboard .card {background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:18px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+        #officer-dashboard .stack {display:flex; flex-direction:column; gap:10px}
+        #officer-dashboard header { display:flex; align-items:center; justify-content:space-between; padding:18px 24px; position:sticky; top:0; backdrop-filter: blur(10px); border-bottom:1px solid rgba(255,255,255,.06); z-index:5; background:linear-gradient(180deg, rgba(10,15,31,.8), rgba(10,15,31,.5)); }
+        #officer-dashboard .searchbar {display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px 12px; width:380px}
+        #officer-dashboard .searchbar input {flex:1; background:transparent; border:none; color:#e2e8f0; outline:none}
+        #officer-dashboard .user {display:flex; align-items:center; gap:12px}
+        #officer-dashboard .user img {width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,.15)}
+        #officer-dashboard .toolbar {display:flex; gap:12px; flex-wrap:wrap; margin:18px 0}
+        #officer-dashboard .btn {display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:#e2e8f0; cursor:pointer; transition:.2s}
+        #officer-dashboard .btn:hover {transform: translateY(-1px); background:rgba(255,255,255,.07)}
+        #officer-dashboard .btn.pri {background:linear-gradient(135deg, #22d3ee33, #a78bfa33); border-color: rgba(255,255,255,.2)}
+        #officer-dashboard .btn.good {background:rgba(34,197,94,.15); border-color:rgba(34,197,94,.35)}
+        #officer-dashboard .btn.warn {background:rgba(245,158,11,.15); border-color:rgba(245,158,11,.35)}
+        #officer-dashboard .btn.bad {background:rgba(239,68,68,.15); border-color:rgba(239,68,68,.35)}
+        #officer-dashboard .input, #officer-dashboard select, #officer-dashboard .date {width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:#e2e8f0}
+        #officer-dashboard .table {width:100%; border-collapse:separate; border-spacing:0 10px;}
+        #officer-dashboard .table thead th {font-size:12px; font-weight:600; color:#94a3b8; text-align:left; padding:8px 12px}
+        #officer-dashboard .table tbody tr {background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); transition: background .2s ease;}
+        #officer-dashboard .table tbody tr:hover { background: rgba(255,255,255,.08); }
+        #officer-dashboard .table tbody tr td {padding:14px 12px; border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06)}
+        #officer-dashboard .table tbody tr td:first-child {border-left:1px solid rgba(255,255,255,.06); border-top-left-radius:12px; border-bottom-left-radius:12px}
+        #officer-dashboard .table tbody tr td:last-child {border-right:1px solid rgba(255,255,255,.06); border-top-right-radius:12px; border-bottom-right-radius:12px}
+        #officer-dashboard .status {display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-size:12px; font-weight: 500; border:1px solid transparent; background: transparent !important;}
+        #officer-dashboard .status.pending {color:#f59e0b; border-color:rgba(245,158,11,.35)}
+        #officer-dashboard .status.awaiting {color:#3b82f6; border-color:rgba(59,130,246,.35)}
+        #officer-dashboard .status.confirmed {color:#22c55e; border-color:rgba(34,197,94,.35)}
+        #officer-dashboard .status.cancelled {color:#ef4444; border-color:rgba(239,68,68,.35)}
+        #officer-dashboard .tags {display:flex; gap:8px; flex-wrap:wrap}
+        #officer-dashboard .tag {background:#1e293b; color:#94a3b8; padding:6px 10px; border-radius:999px; font-size:11px; border:1px solid rgba(255,255,255,.06)}
+        #officer-dashboard .drawer {position:fixed; right:-520px; top:0; height:100vh; width:520px; background:#0a0f1f; border-left:1px solid rgba(255,255,255,.08); box-shadow:0 10px 30px rgba(0,0,0,.35); transition: right .35s ease; z-index:50; display:flex; flex-direction:column}
+        #officer-dashboard .drawer.open {right:0}
+        #officer-dashboard .drawer header {position:sticky; top:0; background:linear-gradient(180deg, rgba(10,15,31,.95), rgba(10,15,31,.6));}
+        #officer-dashboard .drawer .body {padding:18px 20px; overflow:auto; display:flex; flex-direction:column; gap:16px}
+        #officer-dashboard .doclist {display:grid; grid-template-columns: repeat(3, 1fr); gap:12px}
+        #officer-dashboard .doc {background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:10px}
+        #officer-dashboard .doc .thumb {height:110px; background:linear-gradient(135deg, rgba(34,211,238,.2), rgba(167,139,250,.2)); border-radius:10px; display:grid; place-items:center; font-size:28px}
+        #officer-dashboard .doc .meta {font-size:12px; color:#94a3b8}
+        #officer-dashboard .modal {position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:60}
+        #officer-dashboard .modal.show {display:flex}
+        #officer-dashboard .modal .panel {width:min(520px, 92vw); background:#0b1223; border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+        #officer-dashboard .toast {position:fixed; bottom:18px; right:18px; display:flex; flex-direction:column; gap:10px; z-index:80}
+        #officer-dashboard .toast .item {background:#0b1223; border:1px solid rgba(255,255,255,.12); padding:12px 14px; border-radius:12px; min-width:280px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+        #officer-dashboard .kpi-card { border-top: 3px solid transparent; transition: all .2s ease; }
+        #officer-dashboard .kpi-card:hover { transform: translateY(-4px); background: rgba(255,255,255,.07); }
+        #officer-dashboard .kpi-card .kpi-value { font-size: 28px; font-weight: 800; }
+        #officer-dashboard .kpi-card div:first-child { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #94a3b8; }
+        #officer-dashboard .kpi-warn { border-top-color: #f59e0b; }
+        #officer-dashboard .kpi-info { border-top-color: #3b82f6; }
+        #officer-dashboard .kpi-good { border-top-color: #22c55e; }
+        #officer-dashboard .kpi-bad { border-top-color: #ef4444; }
+        #officer-dashboard .history-list { list-style-type: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+        #officer-dashboard .history-list li { font-size: 13px; display: flex; gap: 10px; align-items: flex-start; }
+        #officer-dashboard .history-list .icon { width: 28px; height: 28px; flex-shrink: 0; display: grid; place-items: center; border-radius: 50%; background: #1e293b; }
+        #officer-dashboard .history-list .time { font-size: 11px; color: #94a3b8; }
+        @media (max-width: 980px){
+            #officer-dashboard .app{grid-template-columns: 1fr}
+            #officer-dashboard aside{position:static; height:auto}
+            #officer-dashboard .kpis{grid-template-columns: repeat(2, 1fr)}
+            #officer-dashboard .searchbar{width:100%}
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================================================================= -->
+    <!-- ============== PAGE 1: LANDING PAGE (index.html) ================ -->
+    <!-- ================================================================= -->
+    <div id="landing-page" class="page">
+        <header>
+            <h1>SL Gov Appointment Portal</h1>
+            <nav>
+                <a href="#departments-landing">Departments</a>
+                <a href="#" onclick="showPage('citizen-portal')">Book Now</a>
+                <a href="#" onclick="showPage('officer-dashboard')">Officer Login</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <div class="slideshow-container">
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1470&q=80" alt="Landscape view of Sri Lanka" />
+                    <div class="caption">Streamline Your Government Services</div>
+                </div>
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1470&q=80" alt="Person using a laptop for online booking" />
+                    <div class="caption">Book Appointments Easily Online</div>
+                </div>
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1470&q=80" alt="People collaborating in an office" />
+                    <div class="caption">Save Time and Avoid Queues</div>
+                </div>
+                <button class="prev" onclick="landing_plusSlides(-1)">❮</button>
+                <button class="next" onclick="landing_plusSlides(1)">❯</button>
+            </div>
+            <div class="hero-text">
+                <h2>One Portal. All Government Services.</h2>
+                <p>Book appointments for any Sri Lankan government service in just a few clicks. Save time, skip queues, and get your work done faster.</p>
+                <a href="#" onclick="showPage('citizen-portal')" class="get-started-btn">Get Started</a>
+            </div>
+        </section>
+
+        <section class="departments" id="departments-landing">
+            <h3>Browse Government Departments</h3>
+            <div class="grid">
+                <a class="card" href="https://dmt.gov.lk/index.php?lang=en" target="_blank" rel="noopener noreferrer">
+                    <h4>Motor Traffic Department</h4>
+                    <p>Driver’s licenses, vehicle registrations</p>
+                </a>
+                <a class="card" href="https://www.immigration.gov.lk/" target="_blank" rel="noopener noreferrer">
+                    <h4>Department of Immigration</h4>
+                    <p>Passports, visa services</p>
+                </a>
+                <a class="card" href="https://www.ird.gov.lk/" target="_blank" rel="noopener noreferrer">
+                    <h4>Inland Revenue Department</h4>
+                    <p>Tax filings, queries</p>
+                </a>
+                <a class="card" href="http://www.drp.gov.lk/" target="_blank" rel="noopener noreferrer">
+                    <h4>Registrar of Persons</h4>
+                    <p>NIC applications</p>
+                </a>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2025 Sri Lanka Government Service Portal | Designed for Citizens</p>
+        </footer>
+    </div>
+
+
+    <!-- =================================================================== -->
+    <!-- ============== PAGE 2: CITIZEN PORTAL (newpage.html) ============== -->
+    <!-- =================================================================== -->
+    <div id="citizen-portal" class="page">
+        <header>
+            <div class="brand">
+                <div class="logo">LK</div>
+                <div>
+                    <div style="font-weight:800;letter-spacing:.3px" data-lang-key="portalTitle">Gov.lk Services Portal</div>
+                    <div class="hint" id="citizen-clock">—</div>
+                </div>
+            </div>
+            <nav>
+                <a href="#" onclick="showPage('landing-page')">Home</a>
+                <a href="#services-citizen">Services</a>
+                <a href="#book-citizen">Book</a>
+                <a href="#appointments-citizen">My Appointments</a>
+                <a href="#" id="dashboardNav" style="display:none;" data-lang-key="navDashboard">Dashboard</a>
+                <select id="lang-switcher">
+                    <option value="en">English</option>
+                    <option value="si">සිංහල</option>
+                    <option value="ta">தமிழ்</option>
+                </select>
+                <div class="notification-bell">
+                    <button class="btn ghost" id="notificationBtn" style="border-radius: 50%; width: 40px; height: 40px;">
+                        <span>🔔</span>
+                        <span id="notification-count">0</span>
+                    </button>
+                    <div id="notification-list"></div>
+                </div>
+                <button class="btn ghost" id="darkToggle" style="border-radius: 50%; width: 40px; height: 40px;">🌙</button>
+            </nav>
+        </header>
+
+        <section class="hero"><div class="container"><span class="pill">Sri Lanka</span><h1 data-lang-key="heroTitle">One portal for government services 🇱🇰</h1><p data-lang-key="heroSubtitle">Browse departments, book appointments, and manage your services efficiently.</p><div class="toolbar"><div class="search"><span>🔎</span><input id="q" placeholder="Search department, service..." data-lang-key="searchPlaceholder"/></div><button class="btn secondary" id="addServiceBtn" data-lang-key="proposeServiceBtn">➕ Propose New Service</button></div></div></section>
+        <main class="container">
+            <section id="services-citizen"><h2 data-lang-key="departmentsTitle">Departments & Agencies</h2><div class="filters" id="deptFilters"><button class="btn ghost active" data-filter="all">All</button><button class="btn ghost" data-filter="Identity">Identity</button><button class="btn ghost" data-filter="Transport">Transport</button><button class="btn ghost" data-filter="Utilities">Utilities</button></div><div class="grid" id="deptGrid"></div></section>
+            <section id="book-citizen" style="margin-top:1.25rem"><h2 data-lang-key="quickBookTitle">Quick Book</h2><div class="calendar"><div class="row"><div class="field"><label data-lang-key="departmentLabel">Department</label><select id="qbDept"></select></div><div class="field"><label data-lang-key="serviceLabel">Service</label><select id="qbService"></select></div></div><div class="row" style="margin-top:.5rem"><div class="field"><label data-lang-key="districtLabel">District</label><select id="qbDistrict"></select></div><div class="field"><label data-lang-key="venueLabel">Venue</label><select id="qbVenue"></select></div></div><div class="row" style="margin-top:.5rem"><div class="field"><label data-lang-key="dateLabel">Date</label><input type="date" id="qbDate"></div><div class="field"><label data-lang-key="timeLabel">Time</label><select id="qbTime"></select></div></div><div class="row" style="margin-top:.75rem"><button class="btn" id="qbBook" data-lang-key="bookNowBtn">Book Now</button></div><p id="qbMsg" style="font-weight:700;margin-top:.75rem"></p></div></section>
+            <section id="appointments-citizen" style="margin-top:1.25rem"><h2 data-lang-key="myAppointmentsTitle">My Appointments</h2><div class="calendar"><table class="table" id="apptTable"></table></div></section>
+        </main>
+        <footer><div data-lang-key="footerText">© 2025 Gov.lk Services Portal — Demo for Designathon | Not an official government website.</div><div style="margin-top: 8px; font-size: 0.9em;"><a href="#" onclick="showPage('officer-dashboard')" style="color: white; text-decoration: underline;">Officer Console</a></div></footer>
+        <div class="modal" id="serviceModal"><div class="box"><header><strong id="smTitle"></strong><button class="close" onclick="citizen_closeModal('serviceModal')">✕</button></header><div class="content"><div class="stepper" id="smSteps"></div><div id="smBody"></div></div></div></div>
+        <div class="modal" id="proposeModal"><div class="box"><header><strong>Propose Service</strong><button class="close" onclick="citizen_closeModal('proposeModal')">✕</button></header><div class="content"><div class="row"><div class="field"><label>Department</label><input id="psDept"/></div></div><div class="row"><div class="field"><label>Service Name</label><input id="psName"/></div></div><div class="row"><button class="btn" id="psSave">Submit</button><span class="hint" id="psMsg"></span></div></div></div></div>
+        <div class="modal" id="dashboardModal"><div class="box"><header><strong data-lang-key="dashboardTitle">My Dashboard</strong><button class="close" onclick="citizen_closeModal('dashboardModal')">✕</button></header><div class="content" id="dashboardBody"></div></div></div>
+        <div class="modal" id="ratingModal"><div class="box"><header><strong>Rate Service</strong><button class="close" onclick="citizen_closeModal('ratingModal')">✕</button></header><div class="content"><p>How was your experience with <strong id="rateSvcName"></strong>?</p><div class="star-rating" id="rateStars"></div><div class="field" style="margin-top: 1rem;"><label>Comments</label><input id="rateComment" /></div><button class="btn" id="rateSubmitBtn">Submit</button></div></div></div>
+        <div class="modal" id="confirmModal"><div class="box"><header><strong>Booking Confirmed!</strong><button class="close" onclick="citizen_closeModal('confirmModal')">✕</button></header><div class="content" id="confirmBody"></div></div></div>
+    </div>
+
+
+    <!-- =================================================================== -->
+    <!-- ============ PAGE 3: OFFICER DASHBOARD (officer.html) ============= -->
+    <!-- =================================================================== -->
+    <div id="officer-dashboard" class="page">
+        <div class="app">
+            <aside>
+                <div class="brand">
+                    <div style="width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg, #22d3ee55, #a78bfa55); border:1px solid rgba(255,255,255,.25)">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight:800; letter-spacing:.3px">Gov.lk Portal</div>
+                        <div class="badge"><i class="fa-regular fa-circle-check"></i> Officer Console</div>
+                    </div>
+                </div>
+                <nav>
+                    <a href="#" onclick="showPage('citizen-portal')"><i class="fa-solid fa-arrow-left"></i> Back to Citizen Portal</a>
+                    <a href="#" class="active"><i class="fa-solid fa-table-columns"></i> Dashboard</a>
+                    <a href="#"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
+                    <a href="#"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+                    <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
+                </nav>
+                <div style="height:1px;background:rgba(255,255,255,.08); margin:16px 0"></div>
+                <div class="stack">
+                    <div class="card stack">
+                        <div style="font-size:12px; color:#94a3b8">Today</div>
+                        <div style="display:flex; gap:8px; align-items:baseline"><div style="font-size:26px; font-weight:800" id="kpi_today">—</div><span style="color:#94a3b8; font-size:12px">bookings</span></div>
+                        <div style="display:flex; gap:10px">
+                            <span class="tag"><i class="fa-regular fa-clock"></i> Pending <b id="kpi_pending">0</b></span>
+                            <span class="tag"><i class="fa-regular fa-circle-check"></i> Confirmed <b id="kpi_confirmed">0</b></span>
+                        </div>
+                    </div>
+                    <div class="card stack">
+                        <div style="font-size:12px; color:#94a3b8">Quick Actions</div>
+                        <button class="btn pri" id="bulkConfirm"><i class="fa-solid fa-bolt"></i> Confirm Selected</button>
+                        <button class="btn warn" id="bulkCorrection"><i class="fa-solid fa-pen"></i> Request Corrections</button>
+                        <button class="btn bad" id="bulkCancel"><i class="fa-solid fa-ban"></i> Cancel Selected</button>
+                    </div>
+                </div>
+            </aside>
+            <main>
+                <header>
+                    <div class="searchbar">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input id="search" placeholder="Search by name, NIC, ref #, service..."/>
+                    </div>
+                    <div class="user">
+                        <span class="badge"><i class="fa-solid fa-building"></i> Dept: Immigration</span>
+                        <img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?q=80&w=200&auto=format&fit=crop" alt="user"/>
+                    </div>
+                </header>
+                <section style="padding:22px 24px 6px" class="stack">
+                    <div class="kpis">
+                        <div class="card stack kpi-card kpi-warn">
+                            <div><i class="fa-solid fa-clock"></i> Pending Review</div>
+                            <div class="kpi-value" id="kpi_pending2">—</div>
+                        </div>
+                        <div class="card stack kpi-card kpi-info">
+                            <div><i class="fa-solid fa-file-circle-question"></i> Awaiting Documents</div>
+                            <div class="kpi-value" id="kpi_docs">—</div>
+                        </div>
+                        <div class="card stack kpi-card kpi-good">
+                            <div><i class="fa-solid fa-check-double"></i> Confirmed Today</div>
+                            <div class="kpi-value" id="kpi_conf_today">—</div>
+                        </div>
+                        <div class="card stack kpi-card kpi-bad">
+                            <div><i class="fa-solid fa-user-slash"></i> No-shows (7d)</div>
+                            <div class="kpi-value" id="kpi_noshow">—</div>
+                        </div>
+                    </div>
+                    <div class="toolbar">
+                        <select id="f_dept" class="input"> <option value="">All Departments</option> <option>Immigration & Emigration</option> <option>Motor Traffic (RMV)</option> <option>Sri Lanka Railways</option> <option>Utility Payments</option> </select>
+                        <select id="f_status" class="input"> <option value="">All Statuses</option> <option value="pending">Pending</option> <option value="awaiting">Awaiting Docs</option> <option value="confirmed">Confirmed</option> <option value="cancelled">Cancelled</option> </select>
+                        <input type="date" id="f_from" class="date" /> <input type="date" id="f_to" class="date" />
+                        <button class="btn" id="clearFilters"><i class="fa-solid fa-eraser"></i> Clear</button>
+                        <button class="btn pri" id="exportCsv"><i class="fa-solid fa-file-export"></i> Export CSV</button>
+                    </div>
+                    <div class="card">
+                        <table class="table" id="table">
+                            <thead><tr><th><input type="checkbox" id="selectAll"/></th><th>Ref #</th><th>Citizen</th><th>NIC</th><th>Service</th><th>Date / Time</th><th>Tags</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="tbody"></tbody>
+                        </table>
+                    </div>
+                    <div class="card" style="height: 350px;"> <canvas id="chart"></canvas> </div>
+                </section>
+            </main>
+        </div>
+        <div class="drawer" id="drawer">
+            <header>
+                <div style="display:flex; align-items:center; gap:12px">
+                    <button class="btn" id="closeDrawer"><i class="fa-solid fa-arrow-left"></i></button>
+                    <div class="stack"> <div style="font-weight:800" id="d_name">Citizen Name</div> <div style="color:#94a3b8; font-size:12px">Ref <span id="d_ref">—</span> · <span id="d_dept">—</span> · <span id="d_service">—</span></div> </div>
+                </div>
+                <div class="user"> <span class="badge"><i class="fa-regular fa-calendar-check"></i> <span id="d_datetime">—</span></span> </div>
+            </header>
+            <div class="body">
+                <div class="card stack">
+                    <div style="display:flex; justify-content:space-between; align-items:center">
+                        <div><div style="font-weight:700">Submitted Documents</div><div style="font-size:12px; color:#94a3b8">Review and mark issues if any</div></div>
+                        <div class="tags"><span class="tag" id="d_status">Status: —</span></div>
+                    </div>
+                    <div class="doclist" id="d_docs"></div>
+                </div>
+                <div class="card stack">
+                    <div style="font-weight:700">Officer Notes</div>
+                    <textarea id="d_notes" class="input" rows="4" placeholder="Add internal notes visible to officers only..."></textarea>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap"> <button class="btn good" id="d_confirm"><i class="fa-solid fa-circle-check"></i> Confirm</button> <button class="btn warn" id="d_request"><i class="fa-solid fa-pen"></i> Request Correction</button> <button class="btn bad" id="d_cancel"><i class="fa-solid fa-ban"></i> Cancel</button> <button class="btn" id="d_reschedule"><i class="fa-solid fa-clock-rotate-left"></i> Reschedule</button> </div>
+                </div>
+                <div class="card stack" id="rescheduleBox" style="display:none">
+                    <div style="font-weight:700">Reschedule Appointment</div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px"> <input type="date" id="d_newdate" class="date"> <input type="time" id="d_newtime" class="date"> </div>
+                    <button class="btn pri" id="d_saveReschedule"><i class="fa-solid fa-floppy-disk"></i> Save New Slot</button>
+                </div>
+                <div class="card stack">
+                    <div style="font-weight:700">Message Citizen</div>
+                    <input class="input" id="d_message" placeholder="Type a short message (e.g., 'Please bring original birth certificate')"/>
+                    <button class="btn pri" id="d_send"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
+                </div>
+                <div class="card stack">
+                    <div style="font-weight:700"><i class="fa-solid fa-timeline"></i> Appointment History</div>
+                    <ul class="history-list" id="d_history"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="modal">
+            <div class="panel stack">
+                <div style="font-weight:800; font-size:18px">Request Corrections</div>
+                <div style="font-size:13px; color:#94a3b8">Explain what needs to be fixed. The citizen will receive this note.</div>
+                <textarea id="m_reason" class="input" rows="4" placeholder="e.g., 'NIC scan is unclear. Please upload a clearer copy.'"></textarea>
+                <div style="display:flex; gap:10px; justify-content:flex-end"> <button class="btn" id="m_cancel">Close</button> <button class="btn warn" id="m_submit"><i class="fa-solid fa-check"></i> Send</button> </div>
+            </div>
+        </div>
+        <div class="toast" id="toast"></div>
+    </div>
+
+
+    <!-- =================================================================== -->
+    <!-- =================== COMBINED JAVASCRIPT LOGIC ===================== -->
+    <!-- =================================================================== -->
+    <script>
+    // ===== 1. CORE NAVIGATION LOGIC =====
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) {
+            targetPage.style.display = 'block';
+        }
+
+        if (pageId === 'officer-dashboard') {
+            document.body.classList.add('officer-theme');
+            initOfficerDashboard(); // Initialize or refresh data when switching to this page
+        } else {
+            document.body.classList.remove('officer-theme');
+            // Refresh citizen data when switching to their portal
+            citizen_renderAppointments();
+            citizen_renderNotifications();
+        }
+        window.scrollTo(0, 0);
+    }
+
+    // ===== 2. LANDING PAGE SCRIPT (index.html) =====
+    let landing_slideIndex = 1;
+    let landing_autoSlideTimeout;
+
+    function landing_plusSlides(n) {
+        clearTimeout(landing_autoSlideTimeout);
+        landing_showSlides(landing_slideIndex += n);
+    }
+
+    function landing_showSlides(n) {
+        const slides = document.querySelectorAll('#landing-page .slide');
+        if (slides.length === 0) return;
+        if (n > slides.length) { landing_slideIndex = 1 }
+        if (n < 1) { landing_slideIndex = slides.length }
+        slides.forEach(slide => slide.style.display = "none");
+        slides[landing_slideIndex - 1].style.display = "block";
+        landing_autoSlideTimeout = setTimeout(landing_autoSlides, 5000);
+    }
+
+    function landing_autoSlides() {
+        landing_plusSlides(1);
+    }
+
+    // ===== 3. CITIZEN PORTAL SCRIPT (newpage.html) =====
+    const citizen_byId = id => document.getElementById(id);
+    const citizen_save = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+    const citizen_load = (key, def = []) => {
+        const data = localStorage.getItem(key);
+        try { return data ? JSON.parse(data) : def; } catch { return def; }
+    };
+    const citizen_uid = () => 'LK-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+    
+    // Mock Data for Citizen Portal
+    const DISTRICTS=['Colombo','Gampaha','Kandy','Galle','Jaffna','Kurunegala'];
+    const TIME_SLOTS=['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00'];
+    const VENUES=[{id:'imm-col',name:'Immigration Dept – Suhurupaya',district:'Colombo'},{id:'dmt-wer',name:'RMV – Werahera',district:'Colombo'},{id:"util-online", name: "Online Payment Portal", district: "All"}];
+    const TRAIN_STATIONS = ['Colombo Fort', 'Kandy', 'Galle', 'Matara', 'Ella', 'Jaffna'];
+    const MOCK_TRAINS = [{ id: 'T01', name: 'Udarata Menike Express', route: ['Colombo Fort', 'Kandy', 'Ella'], time: '08:30', duration: '9h 30m' }, { id: 'T03', name: 'Ruhunu Kumari Express', route: ['Colombo Fort', 'Galle', 'Matara'], time: '14:25', duration: '3h 10m' }];
+    const DEPARTMENTS=[{id:'imm',name:'Immigration & Emigration',emoji:'🛂',category:'Identity',tags:['passport','visa'],services:[{id:'passport-new',name:'New Passport',venues:['imm-col'],fee:5000,docs:['Original Birth Certificate','NIC Copy']},{id:'passport-renew',name:'Passport Renewal',venues:['imm-col'],fee:4500,docs:['Old Passport','NIC Copy']}]},{id:'dmt',name:'Motor Traffic (RMV)',emoji:'🚗',category:'Transport',tags:['driving license','vehicle'],services:[{id:'dl-new',name:'New Driving License',venues:['dmt-wer'],fee:3500,docs:['NIC Copy','Medical Certificate']}]},{id:'slr',name:'Sri Lanka Railways',emoji:'🚂',category:'Transport',tags:['train','ticket'],services:[{id:'train-ticket',name:'Train Ticket Booking',venues:[],fee:null,docs:['Fee and documents depend on journey.']}]},{id:'util',name:'Utility Payments',emoji:'💡',category:'Utilities',tags:['bill'],services:[{id:'bill-pay',name:'Pay Utility Bill',venues:['util-online'],fee:0,docs:[]}]}];
+    const TRANSLATIONS = { en: { portalTitle: "Gov.lk Services Portal", navServices: "Services", navBook: "Book", navAppointments: "My Appointments", heroTitle: "One portal for government services 🇱🇰", heroSubtitle: "Browse, book, and manage your services efficiently.", searchPlaceholder: "Search department, service...", bookNowBtn: "Book Now", myAppointmentsTitle: "My Appointments" }, si: { portalTitle: "Gov.lk සේවා ද්වාරය", navServices: "සේවා", navBook: "වෙන්කරවා ගන්න", navAppointments: "මගේ වෙන්කිරීම්", heroTitle: "රාජ්‍ය සේවා සඳහා එක් ද්වාරයක් 🇱🇰", heroSubtitle: "දෙපාර්තමේන්තු පිරික්සන්න, වේලාවන් වෙන්කරවා ගන්න.", searchPlaceholder: "දෙපාර්තමේන්තුව, සේවාව සොයන්න...", bookNowBtn: "දැන් වෙන්කරවා ගන්න", myAppointmentsTitle: "මගේ වෙන්කිරීම්" }, ta: { portalTitle: "Gov.lk சேவைகள் தளம்", navServices: "சேவைகள்", navBook: "பதிவு செய்", navAppointments: "எனது பதிவுகள்", heroTitle: "அரச சேவைகளுக்கான ஒரே தளம் 🇱🇰", heroSubtitle: "துறைகளை உலாவுக, சந்திப்புகளை பதிவுசெய்க.", searchPlaceholder: "துறை, சேவையைத் தேடுங்கள்...", bookNowBtn: "இப்போது பதிவு செய்", myAppointmentsTitle: "எனது பதிவுகள்" } };
+
+    let SM_STATE = {};
+    let RESCHEDULE_REF = null;
+
+    function citizen_renderDepartments(filterCategory = 'all', searchTerm = '') {
+        const grid = citizen_byId('deptGrid');
+        if (!grid) return;
+        const filtered = DEPARTMENTS.filter(d => {
+            const categoryMatch = filterCategory === 'all' || d.category === filterCategory;
+            const term = searchTerm.toLowerCase();
+            const searchMatch = term === '' || d.name.toLowerCase().includes(term) || d.tags.some(t => t.includes(term));
+            return categoryMatch && searchMatch;
+        });
+        grid.innerHTML = filtered.map(d => `<div class="card" onclick="citizen_openServiceModal('${d.id}')"><div class="pill">${d.emoji} ${d.name}</div><div class="hint">${d.tags.map(t => `<span class='tag'>#${t}</span>`).join('')}</div></div>`).join('');
+    }
+    function citizen_openModal(id) { const modal = citizen_byId(id); if(modal) modal.classList.add('open'); }
+    function citizen_closeModal(id) { const modal = citizen_byId(id); if(modal) modal.classList.remove('open'); }
+    function citizen_openServiceModal(deptId) {
+        const dept = DEPARTMENTS.find(d => d.id === deptId);
+        if (!dept) return;
+        SM_STATE = { dept: deptId, service: null, venue: null, date: null, time: null };
+        citizen_byId('smTitle').textContent = dept.name;
+        citizen_renderSM();
+        citizen_openModal('serviceModal');
+    }
+    function citizen_renderSM() {
+        const dept = DEPARTMENTS.find(d => d.id === SM_STATE.dept); let body = '';
+        const smBody = citizen_byId('smBody');
+        const smSteps = citizen_byId('smSteps');
+        if (!dept || !smBody || !smSteps) return;
+
+        if (dept.id === 'slr' && SM_STATE.service === 'train-ticket') {
+            const step = !SM_STATE.from ? 'route' : !SM_STATE.trainDetails ? 'select' : 'confirm';
+            smSteps.innerHTML = ['Service', 'Find Route', 'Select Train', 'Confirm'].map((s,i) => `<span class="step ${i <= ['svc','route','select','confirm'].indexOf(step) ? 'active' : ''}">${i+1}. ${s}</span>`).join('');
+            if (step === 'route') {
+                const stationOptions = TRAIN_STATIONS.map(s => `<option value="${s}">${s}</option>`).join('');
+                body = `<h4>Find Your Train</h4><div class="row"><div class="field"><label>From</label><select id="trainFrom">${stationOptions}</select></div><div class="field"><label>To</label><select id="trainTo">${stationOptions}</select></div></div><div class="row" style="margin-top:.5rem"><div class="field"><label>Date</label><input type="date" id="trainDate" min="${new Date().toISOString().split('T')[0]}"></div></div><button class="btn" onclick="citizen_searchForTrains()">Find Trains</button>`;
+            } else if (step === 'select') {
+                const availableTrains = MOCK_TRAINS.filter(train => { const fromIndex = train.route.indexOf(SM_STATE.from); const toIndex = train.route.indexOf(SM_STATE.to); return fromIndex !== -1 && toIndex !== -1 && fromIndex < toIndex; });
+                body = `<h4>Available Trains for ${SM_STATE.from} ➔ ${SM_STATE.to}</h4>` + (availableTrains.length > 0 ? availableTrains.map(train => `<div class="card" onclick="citizen_selectTrain('${train.id}')"><strong>${train.name}</strong><div class="hint">Departs: ${train.time} | Duration: ${train.duration}</div></div>`).join('') : `<p>Sorry, no direct trains found for this route.</p>`);
+            } else if (step === 'confirm') {
+                body = `<h4>Confirm Your Ticket</h4><div class="card"><div><b>Train:</b> ${SM_STATE.trainDetails.name}</div><div><b>Route:</b> ${SM_STATE.from} ➔ ${SM_STATE.to}</div><div><b>Date:</b> ${SM_STATE.date} at ${SM_STATE.trainDetails.time}</div></div><button class="btn" onclick="citizen_confirmBooking()">Confirm Booking</button>`;
+            }
+        } else {
+            const step = !SM_STATE.service ? 'svc' : (!SM_STATE.venue && dept.id !== 'util') ? 'loc' : !(SM_STATE.date && SM_STATE.time) ? 'dt' : 'cf';
+            smSteps.innerHTML = ['Service','Details','Date & Time','Confirm'].map((s,i) => `<span class="step ${i <= ['svc','loc','dt','cf'].indexOf(step) ? 'active' : ''}">${i+1}. ${s}</span>`).join('');
+            if (step === 'svc') { body = `<h4>Select a Service</h4>` + dept.services.map(s => `<div class='card' onclick="citizen_selectService('${s.id}')"><strong>${s.name}</strong></div>`).join(''); }
+            else if (dept.id === 'util') { SM_STATE.venue = 'util-online'; SM_STATE.date = new Date().toISOString().split('T')[0]; SM_STATE.time = 'N/A'; body = `<h4>Pay Your Bill</h4><div class="field"><label>Account Number</label><input id="utilAcc" placeholder="e.g., 123456789"/></div><button class="btn" onclick="citizen_confirmBooking()">Pay Now (Mock)</button>`; }
+            else if (step === 'loc') { const service = dept.services.find(s => s.id === SM_STATE.service); body = `<div class="card checklist"><strong>Required Documents:</strong><ul>${service.docs.map(d => `<li>${d}</li>`).join('')}</ul></div><div class="card" style="margin-top:.5rem"><strong>Fee:</strong> LKR ${service.fee.toLocaleString()}</div><div class="divider"></div><h4>Select Venue</h4>` + VENUES.filter(v => service.venues.includes(v.id)).map(v => `<div class='card' onclick="citizen_selectVenue('${v.id}')"><strong>${v.name}</strong><div class='hint'>${v.district}</div></div>`).join(''); }
+            else if (step === 'dt') { const timeOptions = TIME_SLOTS.map(t => { const isBooked = Math.random() > 0.7; return `<option value="${t}" ${isBooked ? 'disabled' : ''}>${t} ${isBooked ? '(Booked)' : ''}</option>`; }).join(''); body = `<h4>Select Date & Time</h4><div class="row"><div class="field"><label>Date</label><input type="date" id="smDate" min="${new Date().toISOString().split('T')[0]}"></div><div class="field"><label>Time</label><select id="smTime">${timeOptions}</select></div></div><button class="btn" onclick="citizen_selectDateTime()">Next</button>`; }
+            else if (step === 'cf') { const svc = dept.services.find(s => s.id === SM_STATE.service); const ven = VENUES.find(v => v.id === SM_STATE.venue); body = `<h4>Confirm Details</h4><div class="card"><div><b>Service:</b> ${svc.name} (${dept.name})</div><div><b>Venue:</b> ${ven.name}</div><div><b>Date & Time:</b> ${SM_STATE.date} at ${SM_STATE.time}</div><div><b>Fee:</b> LKR ${svc.fee.toLocaleString()}</div></div><button class="btn" onclick="citizen_confirmBooking()">Confirm & Book</button>`; }
+        }
+        smBody.innerHTML = body;
+    }
+    function citizen_searchForTrains() { const from = citizen_byId('trainFrom').value, to = citizen_byId('trainTo').value, date = citizen_byId('trainDate').value; if (from === to || !date) { alert('Please check your inputs.'); return; } SM_STATE.from = from; SM_STATE.to = to; SM_STATE.date = date; citizen_renderSM(); }
+    function citizen_selectTrain(trainId) { SM_STATE.trainDetails = MOCK_TRAINS.find(t => t.id === trainId); SM_STATE.time = SM_STATE.trainDetails.time; citizen_renderSM(); }
+    function citizen_selectService(id) { SM_STATE.service = id; citizen_renderSM(); }
+    function citizen_selectVenue(id) { SM_STATE.venue = id; citizen_renderSM(); }
+    function citizen_selectDateTime() { const date = citizen_byId('smDate').value, time = citizen_byId('smTime').value; if (!date) { alert('Please select a date.'); return; } SM_STATE.date = date; SM_STATE.time = time; citizen_renderSM(); }
+    function citizen_confirmBooking() {
+        let appointments = citizen_load('appointments', []); let newAppt;
+        const dept = DEPARTMENTS.find(d => d.id === SM_STATE.dept);
+        
+        if (RESCHEDULE_REF) {
+             const index = appointments.findIndex(a => a.ref === RESCHEDULE_REF);
+             if (index > -1) {
+                appointments[index].date = SM_STATE.date;
+                appointments[index].time = SM_STATE.time;
+                newAppt = appointments[index];
+             }
+             RESCHEDULE_REF = null;
+        } else {
+            if (dept.id === 'slr') { 
+                newAppt = { ref: citizen_uid(), department: dept.name, service: `Train: ${SM_STATE.trainDetails.name}`, venue: `${SM_STATE.from} ➔ ${SM_STATE.to}`, date: SM_STATE.date, time: SM_STATE.time, status: 'upcoming', deptId: dept.id, serviceId: 'train-ticket' }; 
+            } else {
+                if ((!SM_STATE.date || !SM_STATE.time) && dept.id !== 'util') { alert('Please select date and time.'); return; }
+                const service = dept.services.find(s => s.id === SM_STATE.service); 
+                const venue = VENUES.find(v => v.id === SM_STATE.venue); 
+                newAppt = { ref: citizen_uid(), department: dept.name, service: service.name, venue: venue ? venue.name : 'Online', date: SM_STATE.date, time: SM_STATE.time, status: 'upcoming', deptId: dept.id, serviceId: service.id, venueId: venue ? venue.id : null };
+            }
+            if (newAppt) { appointments.push(newAppt); }
+        }
+
+        citizen_save('appointments', appointments); 
+        citizen_renderAppointments(); 
+        citizen_renderNotifications(); 
+        citizen_closeModal('serviceModal');
+        
+        const confirmationMessage = dept.id === 'slr' ? `Your ticket for <strong>${newAppt.service}</strong> from <strong>${SM_STATE.from} to ${SM_STATE.to}</strong> on <strong>${newAppt.date}</strong> has been confirmed.` : `Your appointment for <strong>${newAppt.service}</strong> on <strong>${newAppt.date}</strong> at <strong>${newAppt.time}</strong> has been confirmed.`;
+        citizen_byId('confirmBody').innerHTML = `<p>${confirmationMessage}</p><p>Your reference number is: <kbd>${newAppt.ref}</kbd></p><button class="btn secondary" onclick="citizen_generateICS('${newAppt.ref}')">📅 Add to Calendar</button>`;
+        citizen_openModal('confirmModal');
+    }
+    function citizen_generateICS(ref){const a=citizen_load("appointments",[]).find(a=>a.ref===ref);if(!a||!a.time||a.time==="N/A")return;const[t,e,s]=a.date.split("-"),[n,o]=a.time.split(":"),r=new Date(t,e-1,s,n,o),i=new Date(r.getTime()+18e5),d=dt=>dt.toISOString().replace(/[-:]/g,"").split(".")[0]+"Z",l=["BEGIN:VCALENDAR","VERSION:2.0","BEGIN:VEVENT",`UID:${a.ref}@gov.lk`,`DTSTAMP:${d(new Date)}`,`DTSTART:${d(r)}`,`DTEND:${d(i)}`,`SUMMARY:${a.service} Appointment`,`LOCATION:${a.venue}`,"END:VEVENT","END:VCALENDAR"].join("\n"),c=new Blob([l],{type:"text/calendar"}),p=URL.createObjectURL(c),m=document.createElement("a");m.href=p;m.download=`appointment-${a.ref}.ics`;document.body.appendChild(m);m.click();document.body.removeChild(m);URL.revokeObjectURL(p)}
+    function citizen_renderAppointments() {
+        const table = citizen_byId('apptTable');
+        if (!table) return;
+        const appointments = citizen_load('appointments', []); const today = new Date().toISOString().split('T')[0];
+        const rows = appointments.map(appt => {
+            const isPast = appt.date < today; const ratings = citizen_load('ratings', {}); const hasBeenRated = ratings[appt.ref]; let actions = '';
+            if (isPast) { actions = hasBeenRated ? `<button class="btn muted" disabled>⭐ Rated</button>` : `<button class="btn secondary" onclick="citizen_openRatingModal('${appt.ref}')">⭐ Rate Service</button>`; }
+            else { actions = `<button class="btn" onclick="citizen_openRescheduleModal('${appt.ref}')">📅 Reschedule</button> <button class="btn warn" onclick="citizen_cancelAppointment('${appt.ref}')">❌ Cancel</button>`; }
+            return `<tr><td>${appt.ref}</td><td>${appt.department}</td><td>${appt.service}</td><td>${appt.venue}</td><td>${appt.date}</td><td>${appt.time}</td><td>${actions}</td></tr>`;
+        }).join('');
+        table.innerHTML = `<thead><tr><th>Ref</th><th>Dept</th><th>Service</th><th>Venue</th><th>Date</th><th>Time</th><th>Actions</th></tr></thead><tbody>${rows || '<tr><td colspan="7">No appointments booked.</td></tr>'}</tbody>`;
+    }
+    function citizen_cancelAppointment(ref) { if (!confirm("Are you sure?")) return; let appointments = citizen_load('appointments', []); citizen_save('appointments', appointments.filter(a => a.ref !== ref)); citizen_renderAppointments(); citizen_renderNotifications(); }
+    function citizen_openRescheduleModal(ref) { 
+        const appt = citizen_load('appointments', []).find(a => a.ref === ref);
+        if (!appt) return;
+        if (appt.department === 'Sri Lanka Railways') { alert("Train tickets cannot be rescheduled. Please cancel and re-book."); return; }
+        RESCHEDULE_REF = ref;
+        SM_STATE = { dept: appt.deptId, service: appt.serviceId, venue: appt.venueId, date: null, time: null }; 
+        citizen_byId('smTitle').textContent = `Reschedule: ${appt.service}`; 
+        citizen_renderSM(); 
+        citizen_selectDateTime(); // Go directly to date/time step
+        citizen_openModal('serviceModal');
+    }
+    function citizen_openRatingModal(ref) { const appt = citizen_load('appointments', []).find(a => a.ref === ref); citizen_byId('rateSvcName').textContent = `${appt.service} at ${appt.venue}`; citizen_byId('rateSubmitBtn').onclick = () => citizen_submitRating(ref); const starContainer = citizen_byId('rateStars'); starContainer.innerHTML = ''; starContainer.dataset.rating = 0; for (let i = 1; i <= 5; i++) { const star = document.createElement('span'); star.className = 'star'; star.textContent = '☆'; star.dataset.value = i; star.onmouseover = () => citizen_highlightStars(i); star.onmouseout = () => citizen_highlightStars(starContainer.dataset.rating); star.onclick = () => { starContainer.dataset.rating = i; citizen_highlightStars(i); }; starContainer.appendChild(star); } citizen_openModal('ratingModal'); }
+    function citizen_highlightStars(rating) { citizen_byId('rateStars').querySelectorAll('.star').forEach(star => { star.textContent = star.dataset.value <= rating ? '★' : '☆'; }); }
+    function citizen_submitRating(ref) { const rating = citizen_byId('rateStars').dataset.rating; if (rating == 0) { alert('Please select a rating.'); return; } const ratings = citizen_load('ratings', {}); ratings[ref] = { rating: rating, comment: citizen_byId('rateComment').value }; citizen_save('ratings', ratings); citizen_renderAppointments(); citizen_closeModal('ratingModal'); alert('Thank you for your feedback!'); }
+    function citizen_renderNotifications() {
+        const countEl = citizen_byId('notification-count');
+        const listEl = citizen_byId('notification-list');
+        if (!countEl || !listEl) return;
+        let notifications = citizen_load('notifications', []);
+        countEl.textContent = notifications.length;
+        listEl.innerHTML = notifications.length > 0 ? notifications.map(n => `<div class="item">${n.text}</div>`).join('') : `<div class="item">No new notifications.</div>`;
+    }
+    function citizen_switchLanguage(lang) { const t = TRANSLATIONS[lang]; document.querySelectorAll('#citizen-portal [data-lang-key]').forEach(el => { const key = el.getAttribute('data-lang-key'); if (t[key]) { el.placeholder ? el.placeholder = t[key] : el.textContent = t[key]; } }); localStorage.setItem('language', lang); }
+
+    // ===== 4. OFFICER DASHBOARD SCRIPT (officer.html) =====
+    let OFFICER_DATA = { items: [] };
+    let officer_current = null;
+    let officer_filter = { q: '', dept: '', status: '', from: '', to: '' };
+
+    function officer_saveData() {
+        citizen_save('officerAppointments', OFFICER_DATA.items);
+    }
+    function officer_loadSeedData() {
+        const savedOfficerData = citizen_load('officerAppointments', null);
+        if (savedOfficerData) {
+            OFFICER_DATA = { items: savedOfficerData };
+        }
+        
+        const citizenAppointments = citizen_load('appointments', []);
+        const officerBaseData = [
+            { ref: 'GLK-100241', name: 'Dinuka Perera', nic: '199712345678', dept: 'Immigration & Emigration', service: 'Passport Renewal', datetime: '2025-08-18T09:30:00', status: 'pending', tags:['first-time','docs-ready'], docs:[{name:'NIC Copy.pdf', size:'220KB'}], history:[{at: '2025-08-15T10:00:00Z', action: 'create', details: 'Appointment booked.'}]},
+        ];
+
+        const existingRefs = new Set(OFFICER_DATA.items.map(a => a.ref));
+        officerBaseData.forEach(item => { if (!existingRefs.has(item.ref)) OFFICER_DATA.items.push(item); });
+        
+        citizenAppointments.forEach(appt => {
+            if (!existingRefs.has(appt.ref)) {
+                const newOfficerAppt = {
+                    ref: appt.ref, name: 'Citizen User', nic: 'YYYYMMDDVVVV', dept: appt.department, service: appt.service,
+                    datetime: `${appt.date}T${appt.time || '00:00'}:00`, status: 'pending', tags: ['new-booking'], docs: [],
+                    history: [{ at: new Date().toISOString(), action: 'create', details: 'Booked via Citizen Portal.' }]
+                };
+                OFFICER_DATA.items.push(newOfficerAppt);
+                existingRefs.add(appt.ref);
+            }
+        });
+        officer_saveData();
+    }
+    const officer_qs = (sel) => document.querySelector(`#officer-dashboard ${sel}`);
+    const officer_qsa = (sel) => [...document.querySelectorAll(`#officer-dashboard ${sel}`)];
+    const officer_fmtDT = iso => iso ? new Date(iso).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'N/A';
+    const officer_toast = (msg) => { const t = document.createElement('div'); t.className = 'item'; t.innerHTML = msg; officer_qs('#toast').appendChild(t); setTimeout(() => t.remove(), 4200); };
+    function officer_addHistory(itemRef, action, details = '') {
+        const item = OFFICER_DATA.items.find(i => i.ref === itemRef);
+        if (!item) return;
+        if (!item.history) item.history = [];
+        item.history.unshift({ at: new Date().toISOString(), action, details });
+        officer_saveData();
+    }
+    function officer_renderKPIs() {
+        const today = new Date().toISOString().slice(0, 10);
+        const todays = OFFICER_DATA.items.filter(x => x.datetime.slice(0, 10) === today);
+        officer_qs('#kpi_today').textContent = todays.length;
+        const pendingCount = OFFICER_DATA.items.filter(x => x.status === 'pending').length;
+        officer_qs('#kpi_pending').textContent = pendingCount;
+        officer_qs('#kpi_confirmed').textContent = OFFICER_DATA.items.filter(x => x.status === 'confirmed').length;
+        officer_qs('#kpi_pending2').textContent = pendingCount;
+        officer_qs('#kpi_docs').textContent = OFFICER_DATA.items.filter(x => x.status === 'awaiting').length;
+        officer_qs('#kpi_conf_today').textContent = todays.filter(x => x.status === 'confirmed').length;
+        officer_qs('#kpi_noshow').textContent = Math.floor(Math.random() * 3) + 1;
+    }
+    function officer_matchesFilter(x) {
+        const q = officer_filter.q.toLowerCase();
+        const inQ = !q || [x.ref, x.name, x.nic, x.dept, x.service].some(v => String(v).toLowerCase().includes(q));
+        const inDept = !officer_filter.dept || x.dept === officer_filter.dept;
+        const inStatus = !officer_filter.status || x.status === officer_filter.status;
+        const d = x.datetime.slice(0, 10);
+        const inFrom = !officer_filter.from || d >= officer_filter.from;
+        const inTo = !officer_filter.to || d <= officer_filter.to;
+        return inQ && inDept && inStatus && inFrom && inTo;
+    }
+    const officer_statusLabel = s => ({ pending: 'Pending', awaiting: 'Awaiting Docs', confirmed: 'Confirmed', cancelled: 'Cancelled' })[s] || s;
+    const officer_statusIcon = s => ({ pending: 'fa-clock', awaiting: 'fa-file-circle-question', confirmed: 'fa-circle-check', cancelled: 'fa-circle-xmark' })[s] || 'fa-circle';
+    const officer_badge = status => `<span class="status ${status}"><i class="fa-solid ${officer_statusIcon(status)}"></i>${officer_statusLabel(status)}</span>`;
+    function officer_renderTable() {
+        const rows = OFFICER_DATA.items.filter(officer_matchesFilter).sort((a, b) => new Date(a.datetime) - new Date(b.datetime)).map(x => `
+            <tr data-ref="${x.ref}"><td><input type="checkbox" class="rowcheck"></td><td><span class="tag">${x.ref}</span></td><td><a href="#" onclick="event.preventDefault(); officer_filterByName('${x.name}')" style="font-weight:600; color: #e2e8f0; text-decoration: none;">${x.name}</a><div style="font-size:12px; color:#94a3b8">${x.dept}</div></td><td>${x.nic}</td><td>${x.service}</td><td>${officer_fmtDT(x.datetime)}</td><td class="tags">${(x.tags || []).map(t => `<span class='tag'>${t}</span>`).join('')}</td><td>${officer_badge(x.status)}</td><td style="display:flex; gap:8px"><button class="btn" onclick="officer_openDrawer('${x.ref}')"><i class="fa-regular fa-eye"></i></button><button class="btn good" onclick="officer_quick('${x.ref}','confirmed')"><i class="fa-solid fa-check"></i></button><button class="btn warn" onclick="officer_quick('${x.ref}','awaiting')"><i class="fa-solid fa-pen"></i></button><button class="btn bad" onclick="officer_quick('${x.ref}','cancelled')"><i class="fa-solid fa-ban"></i></button></td></tr>`
+        ).join('');
+        const tbody = officer_qs('#tbody');
+        if (tbody) tbody.innerHTML = rows || `<tr><td colspan="9" style="text-align:center; color:#94a3b8; padding:30px">No items found</td></tr>`;
+        const selectAll = officer_qs('#selectAll');
+        if (selectAll) selectAll.checked = false;
+    }
+    function officer_openDrawer(ref) {
+        officer_current = OFFICER_DATA.items.find(x => x.ref === ref); if (!officer_current) return;
+        officer_qs('#d_name').textContent = officer_current.name; officer_qs('#d_ref').textContent = officer_current.ref; officer_qs('#d_dept').textContent = officer_current.dept; officer_qs('#d_service').textContent = officer_current.service; officer_qs('#d_datetime').textContent = officer_fmtDT(officer_current.datetime); officer_qs('#d_status').innerHTML = officer_badge(officer_current.status);
+        const historyHtml = (officer_current.history || []).map(h => { const icons = { status: 'fa-flag', reschedule: 'fa-calendar-days', correction: 'fa-pen', message: 'fa-paper-plane', create: 'fa-plus' }; return `<li><div class="icon"><i class="fa-solid ${icons[h.action] || 'fa-info-circle'}"></i></div><div><strong>${h.action.charAt(0).toUpperCase() + h.action.slice(1)}</strong>: ${h.details}<div class="time">${new Date(h.at).toLocaleString()}</div></div></li>`; }).join('');
+        officer_qs('#d_history').innerHTML = historyHtml || `<li>No history recorded.</li>`;
+        officer_qs('#rescheduleBox').style.display = 'none';
+        officer_qs('#drawer').classList.add('open');
+    }
+    function officer_updateStatus(ref, status) {
+        const item = OFFICER_DATA.items.find(x => x.ref === ref); if (!item) return;
+        item.status = status;
+        officer_addHistory(ref, 'status', `Status changed to ${officer_statusLabel(status)}`);
+        officer_saveData();
+        officer_renderKPIs(); officer_renderTable();
+        return item;
+    }
+    function officer_quick(ref, status) {
+        officer_updateStatus(ref, status);
+        officer_toast(`<b>${ref}</b> marked as <b>${officer_statusLabel(status)}</b>.`);
+    }
+    function officer_filterByName(name) { officer_qs('#search').value = name; officer_filter.q = name; officer_renderTable(); }
+    function officer_renderChart() {
+        const ctx = officer_qs('#chart')?.getContext('2d'); if (!ctx) return;
+        if (window.myChart) window.myChart.destroy();
+        const labels = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return d.toLocaleDateString('en-US', { weekday: 'short' }); }).reverse();
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300); gradient.addColorStop(0, 'rgba(34, 211, 238, 0.5)'); gradient.addColorStop(1, 'rgba(34, 211, 238, 0)');
+        window.myChart = new Chart(ctx, { type: 'line', data: { labels, datasets: [ { label: 'New Bookings', data: labels.map(() => Math.floor(Math.random() * 10) + 5), borderColor: '#22d3ee', backgroundColor: gradient, fill: true, tension: 0.4, pointBackgroundColor: '#22d3ee' }, { label: 'Completed', data: labels.map(() => Math.floor(Math.random() * 8) + 3), borderColor: '#22c55e', fill: false, tension: 0.4, pointBackgroundColor: '#22c55e' } ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#e2e8f0' } } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#94a3b8' } }, y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#94a3b8', precision: 0 } } } } });
+    }
+    
+    let officerDashboardInitialized = false;
+    function initOfficerDashboard() {
+        officer_loadSeedData();
+        officer_renderKPIs();
+        officer_renderTable();
+        officer_renderChart();
+
+        if (officerDashboardInitialized) return;
+
+        // Drawer Actions
+        officer_qs('#closeDrawer').onclick = () => officer_qs('#drawer').classList.remove('open');
+        officer_qs('#d_confirm').onclick = () => { if (!officer_current) return; officer_quick(officer_current.ref, 'confirmed'); officer_qs('#d_status').innerHTML = officer_badge('confirmed'); };
+        officer_qs('#d_request').onclick = () => { if (!officer_current) return; officer_qs('#modal').classList.add('show'); officer_qs('#m_reason').value = ''; };
+        officer_qs('#d_cancel').onclick = () => { if (!officer_current) return; officer_quick(officer_current.ref, 'cancelled'); officer_qs('#d_status').innerHTML = officer_badge('cancelled'); };
+        
+        // Reschedule
+        officer_qs('#d_reschedule').onclick = () => { officer_qs('#rescheduleBox').style.display = 'block'; };
+        officer_qs('#d_saveReschedule').onclick = () => {
+            if (!officer_current) return;
+            const newDate = officer_qs('#d_newdate').value;
+            const newTime = officer_qs('#d_newtime').value;
+            if (!newDate || !newTime) return alert('Please select both a new date and time.');
+            
+            officer_current.datetime = `${newDate}T${newTime}:00`;
+            officer_addHistory(officer_current.ref, 'reschedule', `Rescheduled to ${officer_fmtDT(officer_current.datetime)}`);
+            officer_saveData();
+            officer_renderTable();
+            officer_qs('#d_datetime').textContent = officer_fmtDT(officer_current.datetime);
+            officer_qs('#rescheduleBox').style.display = 'none';
+            officer_toast(`Appointment ${officer_current.ref} rescheduled.`);
+        };
+        
+        // Message Citizen
+        officer_qs('#d_send').onclick = () => {
+            if (!officer_current) return;
+            const message = officer_qs('#d_message').value.trim();
+            if (!message) return;
+            officer_addHistory(officer_current.ref, 'message', `Sent: "${message}"`);
+            const notifications = citizen_load('notifications', []);
+            notifications.push({ ref: officer_current.ref, text: `Message about ${officer_current.service}: ${message}`});
+            citizen_save('notifications', notifications);
+            officer_toast('Message sent to citizen.');
+            officer_qs('#d_message').value = '';
+        };
+
+        // Modal Actions
+        officer_qs('#m_cancel').onclick = () => officer_qs('#modal').classList.remove('show');
+        officer_qs('#m_submit').onclick = () => {
+            const reason = officer_qs('#m_reason').value.trim(); if (!reason || !officer_current) return;
+            officer_updateStatus(officer_current.ref, 'awaiting');
+            officer_addHistory(officer_current.ref, 'correction', `Requested: "${reason}"`);
+            const notifications = citizen_load('notifications', []);
+            notifications.push({ ref: officer_current.ref, text: `Update for ${officer_current.service}: ${reason}`});
+            citizen_save('notifications', notifications);
+            officer_qs('#d_status').innerHTML = officer_badge('awaiting'); 
+            officer_toast('Correction request sent.');
+            officer_qs('#modal').classList.remove('show');
+        };
+
+        // Filters
+        officer_qsa('#search, #f_dept, #f_status, #f_from, #f_to').forEach(el => {
+            el.oninput = el.onchange = (e) => {
+                const key = e.target.id.startsWith('f_') ? e.target.id.substring(2) : e.target.id;
+                officer_filter[key] = e.target.value;
+                officer_renderTable();
+            };
+        });
+        officer_qs('#clearFilters').onclick = () => {
+            officer_filter = { q: '', dept: '', status: '', from: '', to: '' };
+            officer_qsa('#search, #f_dept, #f_status, #f_from, #f_to').forEach(el => el.value = '');
+            officer_renderTable();
+        };
+
+        // Bulk Actions
+        officer_qs('#selectAll').onchange = (e) => officer_qsa('.rowcheck').forEach(cb => cb.checked = e.target.checked);
+        officer_qs('#bulkConfirm').onclick = () => officer_qsa('.rowcheck:checked').forEach(cb => officer_quick(cb.closest('tr').dataset.ref, 'confirmed'));
+        officer_qs('#bulkCorrection').onclick = () => officer_qsa('.rowcheck:checked').forEach(cb => officer_quick(cb.closest('tr').dataset.ref, 'awaiting'));
+        officer_qs('#bulkCancel').onclick = () => officer_qsa('.rowcheck:checked').forEach(cb => officer_quick(cb.closest('tr').dataset.ref, 'cancelled'));
+        
+        officerDashboardInitialized = true;
+    }
+    
+    // ===== 5. MASTER INITIALIZATION =====
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Init Landing Page ---
+        landing_showSlides(landing_slideIndex);
+
+        // --- Init Citizen Portal (Event listeners) ---
+        const citizenPortalNode = citizen_byId('citizen-portal');
+        const darkToggle = citizen_byId('darkToggle');
+        if (darkToggle) darkToggle.addEventListener('click', () => { citizenPortalNode.classList.toggle('dark'); darkToggle.textContent = citizenPortalNode.classList.contains('dark') ? "☀️" : "🌙"; });
+        
+        const langSwitcher = citizen_byId('lang-switcher');
+        if (langSwitcher) langSwitcher.addEventListener('change', e => citizen_switchLanguage(e.target.value));
+
+        const searchInput = citizen_byId('q');
+        if (searchInput) searchInput.addEventListener('input', e => citizen_renderDepartments(document.querySelector('#deptFilters .btn.active').dataset.filter, e.target.value));
+        
+        const deptFilters = citizen_byId('deptFilters');
+        if (deptFilters) deptFilters.addEventListener('click', e => { if (e.target.tagName === "BUTTON") { document.querySelectorAll('#deptFilters .btn').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); citizen_renderDepartments(e.target.dataset.filter, searchInput.value); } });
+        
+        const notificationBtn = citizen_byId('notificationBtn');
+        if (notificationBtn) notificationBtn.addEventListener('click', () => citizen_byId('notification-list').classList.toggle('show'));
+
+        const addServiceBtn = citizen_byId('addServiceBtn');
+        if (addServiceBtn) addServiceBtn.addEventListener('click', () => citizen_openModal('proposeModal'));
+
+        // Populate quick book dropdowns
+        const qbDept = citizen_byId('qbDept');
+        if (qbDept) qbDept.innerHTML=DEPARTMENTS.map(d=>`<option value="${d.id}">${d.name}</option>`).join("");
+        const qbDistrict = citizen_byId('qbDistrict');
+        if(qbDistrict) qbDistrict.innerHTML=DISTRICTS.map(d=>`<option>${d}</option>`).join("");
+        const qbTime = citizen_byId('qbTime');
+        if (qbTime) qbTime.innerHTML=TIME_SLOTS.map(t=>`<option>${t}</option>`).join("");
+        
+        // Initial render for citizen portal
+        citizen_renderDepartments(); 
+        citizen_renderAppointments(); 
+        citizen_renderNotifications();
+        setInterval(() => { 
+            const clockEl = citizen_byId('citizen-clock');
+            if (clockEl) clockEl.textContent = new Date().toLocaleTimeString(); 
+        }, 1000);
+        
+        // --- Show Initial Page ---
+        showPage('landing-page');
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌍 Officer Dashboard – The Best in the Universe</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(120deg, #3b82f6, #9333ea, #f43f5e);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(0,0,0,0.7);
+      padding: 20px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      border-bottom: 3px solid #fff;
+    }
+    nav {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(5px);
+      border-bottom: 2px solid #fff;
+    }
+    nav button {
+      background: #fff;
+      color: #111;
+      font-weight: bold;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    nav button:hover {
+      transform: scale(1.1);
+      background: gold;
+      color: #000;
+    }
+    main {
+      flex: 1;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .card {
+      background: rgba(255,255,255,0.15);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px);
+      transition: 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      background: rgba(255,255,255,0.25);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      color: #fff;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.4);
+      text-align: left;
+    }
+    th {
+      background: rgba(255,255,255,0.3);
+    }
+    .actions button {
+      margin: 5px;
+      padding: 5px 15px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: 0.3s;
+    }
+    .approve { background: #22c55e; color: #fff; }
+    .reject { background: #ef4444; color: #fff; }
+    .message { background: #3b82f6; color: #fff; }
+    .approve:hover { background: #16a34a; }
+    .reject:hover { background: #dc2626; }
+    .message:hover { background: #1d4ed8; }
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: rgba(0,0,0,0.7);
+      border-top: 2px solid #fff;
+    }
+    canvas {
+      width: 100% !important;
+      height: 250px !important;
+    }
+  </style>
+</head>
+<body>
+  <header>🚀 Officer Dashboard – Universe Edition</header>
+  <nav>
+    <button onclick="showSection('submissions')">📑 Submissions</button>
+    <button onclick="showSection('analytics')">📊 Analytics</button>
+    <button onclick="showSection('messages')">💬 Messages</button>
+    <button onclick="showSection('settings')">⚙️ Settings</button>
+  </nav>
+
+  <main>
+    <section id="submissions" class="card">
+      <h2>Citizen Submissions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Service</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="submissionTable">
+          <tr>
+            <td>Amara Silva</td>
+            <td>Passport Renewal</td>
+            <td id="status1">Pending</td>
+            <td class="actions">
+              <button class="approve" onclick="updateStatus(1,'Approved')">Approve</button>
+              <button class="reject" onclick="updateStatus(1,'Rejected')">Reject</button>
+              <button class="message" onclick="sendMessage('Amara Silva')">Message</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Kamal Perera</td>
+            <td>Driver’s License</td>
+            <td id="status2">Pending</td>
+            <td class="actions">
+              <button class="approve" onclick="updateStatus(2,'Approved')">Approve</button>
+              <button class="reject" onclick="updateStatus(2,'Rejected')">Reject</button>
+              <button class="message" onclick="sendMessage('Kamal Perera')">Message</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="analytics" class="card" style="display:none;">
+      <h2>📊 Live Analytics</h2>
+      <canvas id="analyticsChart"></canvas>
+    </section>
+
+    <section id="messages" class="card" style="display:none;">
+      <h2>💬 Citizen Messages</h2>
+      <div id="chatBox" style="height:200px; overflow-y:auto; background:rgba(0,0,0,0.3); padding:10px; border-radius:10px;"></div>
+      <input id="chatInput" type="text" placeholder="Type a reply..." style="width:80%; padding:10px; border-radius:10px; border:none;" />
+      <button class="message" onclick="replyMessage()">Send</button>
+    </section>
+
+    <section id="settings" class="card" style="display:none;">
+      <h2>⚙️ Settings</h2>
+      <p>Dark Mode: <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" /></p>
+      <p>Customize Colors (Coming Soon 🚀)</p>
+    </section>
+  </main>
+
+  <footer>🌟 Powered by Innovation | Best Website in the Universe 🌟</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    function showSection(sectionId){
+      document.querySelectorAll('main section').forEach(sec => sec.style.display='none');
+      document.getElementById(sectionId).style.display='block';
+    }
+
+    function updateStatus(id,status){
+      document.getElementById('status'+id).innerText = status;
+      alert('Submission '+id+' has been '+status);
+    }
+
+    function sendMessage(name){
+      let chatBox = document.getElementById('chatBox');
+      let msg = document.createElement('div');
+      msg.innerText = 'Officer to '+name+': Please provide additional details.';
+      chatBox.appendChild(msg);
+    }
+
+    function replyMessage(){
+      let input = document.getElementById('chatInput');
+      if(input.value.trim() !== ''){
+        let chatBox = document.getElementById('chatBox');
+        let reply = document.createElement('div');
+        reply.innerText = 'Officer Reply: '+input.value;
+        chatBox.appendChild(reply);
+        input.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    }
+
+    function toggleDarkMode(){
+      document.body.classList.toggle('dark');
+      if(document.body.classList.contains('dark')){
+        document.body.style.background = '#000';
+      } else {
+        document.body.style.background = 'linear-gradient(120deg, #3b82f6, #9333ea, #f43f5e)';
+      }
+    }
+
+    new Chart(document.getElementById('analyticsChart'),{
+      type:'bar',
+      data:{
+        labels:['Passport','License','Visa','ID','Other'],
+        datasets:[{
+          label:'Processed Requests',
+          data:[12,19,7,14,6],
+          backgroundColor:['#22c55e','#3b82f6','#f59e0b','#ef4444','#8b5cf6']
+        }]
+      }
+    });
+  </script>
+</body>
+</html>

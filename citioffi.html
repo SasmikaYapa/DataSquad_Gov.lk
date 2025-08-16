@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌍 gov.lk – Unified Service Portal</title>
+<style>
+  /* --- Base & Theme --- */
+  * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+  body { background: #f4f6fa; color: #333; min-height:100vh; display:flex; flex-direction:column;}
+  header { background:#003366; color:#fff; padding:15px 30px; display:flex; justify-content:space-between; align-items:center;}
+  header h1 { font-size:20px;}
+  nav a { color:#fff; margin-left:20px; text-decoration:none; font-weight:500; cursor:pointer;}
+  nav a:hover { text-decoration:underline;}
+  .language-selector { margin-left:20px; padding:4px 6px; border-radius:6px; font-size:14px;}
+  
+  main { flex:1; padding:20px; display:none; animation: fadeIn 0.5s; }
+  main.active { display:block; }
+
+  @keyframes fadeIn { 0% {opacity:0;} 100% {opacity:1;} }
+
+  h2 { color:#003366; margin-bottom:20px; }
+  .card { background:#fff; border-radius:10px; padding:20px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+  .btn { background:#003366; color:#fff; padding:8px 15px; border-radius:6px; border:none; cursor:pointer; margin-top:10px;}
+  .btn:hover { background:#00509e; }
+  input, select { padding:6px; margin:5px 0; border-radius:6px; border:1px solid #ccc; width:100%; }
+
+  ul { list-style:none; }
+  li { padding:6px 0; }
+  .status { padding:5px 10px; border-radius:6px; font-size:13px; font-weight:bold;}
+  .pending { background:#fff3cd; color:#856404;}
+  .confirmed { background:#d4edda; color:#155724;}
+  .rejected { background:#f8d7da; color:#721c24;}
+
+  footer { background:#003366; color:#fff; text-align:center; padding:10px; margin-top:20px;}
+
+  #notification { position:fixed; top:20px; right:20px; background:#28a745; color:#fff; padding:10px 15px; border-radius:6px; display:none; animation: fadeInOut 3s ease; }
+  @keyframes fadeInOut { 0% {opacity:0;} 10% {opacity:1;} 90% {opacity:1;} 100% {opacity:0;} }
+
+  /* Chat box */
+  #chatBox { height:150px; overflow-y:auto; background:rgba(0,0,0,0.05); padding:10px; border-radius:10px; margin-bottom:5px;}
+  #chatInput { width:80%; padding:8px; border-radius:6px; border:1px solid #ccc; }
+  #chatBtn { width:18%; padding:8px; border-radius:6px; border:none; background:#003366; color:#fff; cursor:pointer; }
+  #chatBtn:hover { background:#00509e; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="portalTitle">gov.lk Unified Service Portal</h1>
+  <nav>
+    <a onclick="showPage('login')">Login</a>
+    <a onclick="showPage('citizen')">Citizen</a>
+    <a onclick="showPage('officer')">Officer</a>
+    <select class="language-selector" onchange="switchLanguage(this.value)">
+      <option value="en">English</option>
+      <option value="si">සිංහල</option>
+      <option value="ta">தமிழ்</option>
+    </select>
+  </nav>
+</header>
+
+<!-- Notification -->
+<div id="notification"></div>
+
+<!-- Login Page -->
+<main id="login" class="active">
+  <div class="card">
+    <h2 id="loginTitle">Login Portal</h2>
+    <label for="role">Select Role:</label>
+    <select id="role">
+      <option value="citizen">Citizen</option>
+      <option value="officer">Officer</option>
+    </select>
+    <label for="username">Name:</label>
+    <input type="text" id="username" placeholder="Enter your name">
+    <button class="btn" onclick="login()">Login</button>
+  </div>
+</main>
+
+<!-- Citizen Dashboard -->
+<main id="citizen">
+  <h2 id="citizenTitle">Citizen Dashboard</h2>
+  <div class="card">
+    <h3 id="bookService">Book a Service</h3>
+    <select id="service"><option>Passport Renewal</option><option>Driving License</option><option>National ID</option></select>
+    <input type="date" id="date">
+    <label>Upload Document:</label>
+    <input type="file" id="docUpload">
+    <button class="btn" onclick="bookAppointment()">Book Appointment</button>
+  </div>
+  <div class="card">
+    <h3 id="myAppointments">My Appointments</h3>
+    <ul id="appointmentsList"></ul>
+  </div>
+  <div class="card">
+    <h3>Chat with Officer</h3>
+    <div id="chatBox"></div>
+    <input id="chatInput" type="text" placeholder="Type a message...">
+    <button id="chatBtn" onclick="sendMessage()">Send</button>
+  </div>
+</main>
+
+<!-- Officer Dashboard -->
+<main id="officer">
+  <h2 id="officerTitle">Officer Dashboard</h2>
+  <div class="card">
+    <h3 id="incomingApps">Incoming Applications</h3>
+    <ul id="officerAppointments"></ul>
+  </div>
+  <div class="card">
+    <h3>Chat with Citizens</h3>
+    <div id="officerChatBox"></div>
+    <input id="officerChatInput" type="text" placeholder="Reply...">
+    <button id="officerChatBtn" onclick="officerReply()">Send</button>
+  </div>
+</main>
+
+<footer>
+  © 2025 gov.lk | The Most Advanced Service Portal
+</footer>
+
+<script>
+let appointments = [];
+let chat = [];
+
+function showPage(id) {
+  document.querySelectorAll("main").forEach(m=>m.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function login(){
+  let role = document.getElementById("role").value;
+  let name = document.getElementById("username").value.trim();
+  if(!name){ alert("Enter name"); return;}
+  notify(`Welcome, ${name} (${role})!`);
+  showPage(role);
+}
+
+function bookAppointment(){
+  let service = document.getElementById("service").value;
+  let date = document.getElementById("date").value;
+  let doc = document.getElementById("docUpload").files[0]?.name || "No file";
+  if(!date){ alert("Select date"); return; }
+  let app = {service,date,status:"Pending",doc,name:document.getElementById("username").value};
+  appointments.push(app);
+  renderAppointments();
+  notify("Appointment booked!");
+}
+
+function renderAppointments(){
+  let citizenList = document.getElementById("appointmentsList");
+  let officerList = document.getElementById("officerAppointments");
+  citizenList.innerHTML=""; officerList.innerHTML="";
+  appointments.forEach((a,i)=>{
+    citizenList.innerHTML+=`<li>${a.service} on ${a.date} [${a.doc}] <span class="status ${a.status.toLowerCase()}">${a.status}</span></li>`;
+    officerList.innerHTML+=`<li>${a.name} - ${a.service} on ${a.date} <button class="btn" onclick="confirmApp(${i})">Confirm</button> <button class="btn" onclick="rejectApp(${i})">Reject</button></li>`;
+  });
+}
+
+function confirmApp(i){ appointments[i].status="Confirmed"; renderAppointments(); notify("Appointment confirmed!"); }
+function rejectApp(i){ appointments[i].status="Rejected"; renderAppointments(); notify("Appointment rejected!"); }
+
+function notify(msg){
+  let n=document.getElementById("notification");
+  n.innerText=msg; n.style.display="block";
+  setTimeout(()=>n.style.display="none",3000);
+}
+
+// Chat System
+function sendMessage(){
+  let text=document.getElementById("chatInput").value.trim();
+  if(!text) return;
+  let name = document.getElementById("username").value;
+  chat.push({sender:"citizen",name,text});
+  updateChat();
+  document.getElementById("chatInput").value="";
+}
+function officerReply(){
+  let text=document.getElementById("officerChatInput").value.trim();
+  if(!text) return;
+  chat.push({sender:"officer",name:"Officer",text});
+  updateChat();
+  document.getElementById("officerChatInput").value="";
+}
+function updateChat(){
+  let cbox=document.getElementById("chatBox");
+  let obox=document.getElementById("officerChatBox");
+  cbox.innerHTML=""; obox.innerHTML="";
+  chat.forEach(m=>{
+    let msg=document.createElement("div");
+    msg.innerText=`${m.sender==="citizen"?m.name:"Officer"}: ${m.text}`;
+    cbox.appendChild(msg.cloneNode(true));
+    obox.appendChild(msg);
+  });
+}
+
+// Multilingual
+const translations={
+  si:{portalTitle:"gov.lk එක්සත් සේවා මධ්‍යස්ථානය",loginTitle:"ප්‍රවිශ්ටි පුවරුව",citizenTitle:"පුරවැසි පුවරුව",officerTitle:"නිලධාරී පුවරුව",bookService:"සේවාවක් බුක් කරන්න",myAppointments:"මගේ හමුවීම්",incomingApps:"එන අයදුම්පත්"},
+  ta:{portalTitle:"gov.lk ஒருங்கிணைந்த சேவை தளம்",loginTitle:"நுழைவுப் பக்கம்",citizenTitle:"குடிமக்கள் கட்டகம்",officerTitle:"அதிகாரி கட்டகம்",bookService:"சேவையை பதிவு செய்யவும்",myAppointments:"என் நேர்முகங்கள்",incomingApps:"வரவிருக்கும் விண்ணப்பங்கள்"},
+  en:{portalTitle:"gov.lk Unified Service Portal",loginTitle:"Login Portal",citizenTitle:"Citizen Dashboard",officerTitle:"Officer Dashboard",bookService:"Book a Service",myAppointments:"My Appointments",incomingApps:"Incoming Applications"}
+};
+
+function switchLanguage(lang){
+  let t=translations[lang];
+  for(let id in t) document.getElementById(id).innerText=t[id];
+}
+</script>
+</body>
+</html>
